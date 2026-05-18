@@ -192,8 +192,12 @@ async function compressItem(item: FileItem, quality = item.quality): Promise<voi
     });
     if (item.compressedUrl) URL.revokeObjectURL(item.compressedUrl);
     item.quality = quality;
-    item.compressedBlob = new Blob([buffer], { type: MIME_TYPE });
-    item.compressedUrl = URL.createObjectURL(item.compressedBlob);
+
+    const encodedBlob = new Blob([buffer], { type: MIME_TYPE });
+    const outputBlob = encodedBlob.size >= item.file.size ? item.file : encodedBlob;
+
+    item.compressedBlob = outputBlob;
+    item.compressedUrl = URL.createObjectURL(outputBlob);
     setCardState(item, 'done');
   } catch (error) {
     setCardState(item, 'error', error instanceof Error ? error.message : 'Could not compress this file.');
