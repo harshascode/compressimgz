@@ -237,7 +237,7 @@ function selectItem(id: string | null): void {
 
 async function renderSelected(): Promise<void> {
   const item = findItem(selectedId);
-  if (!item) {
+  if (!item?.compressedBlob || !item.compressedUrl) {
     comparisonPanel.classList.remove('ui-settings-visible');
     return;
   }
@@ -247,29 +247,10 @@ async function renderSelected(): Promise<void> {
   originalSizeEl.textContent = formatBytes(item.file.size);
   qualityInput.value = String(item.quality);
   qualitySlider.value = String(item.quality);
-
-  if (!item.compressedBlob || !item.compressedUrl) {
-    compressedSizeEl.textContent = 'Not compressed';
-    savingsPercentEl.textContent = '';
-    await drawSingle(item.originalUrl);
-    return;
-  }
-
   compressedSizeEl.textContent = formatBytes(item.compressedBlob.size);
   const saving = Math.max(0, Math.round((1 - item.compressedBlob.size / item.file.size) * 100));
   savingsPercentEl.textContent = `(-${saving}%)`;
   await drawComparison(item.originalUrl, item.compressedUrl);
-}
-
-async function drawSingle(url: string): Promise<void> {
-  const image = await loadBitmap(url);
-  resizeCanvas();
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawContain(ctx, image, canvas.width, canvas.height);
-  image.close();
-  positionThumb();
 }
 
 async function drawComparison(originalUrl: string, compressedUrl: string): Promise<void> {
