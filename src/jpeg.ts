@@ -144,6 +144,10 @@ function setCardState(item: FileItem, status: Status, detail = ''): void {
     errorState.classList.add('ui-file-state-visible', 'file__state_visible');
     errorState.querySelector<HTMLElement>('.ui-file-state-detail')!.textContent = detail;
   } else {
+    const doneState = card.querySelector<HTMLElement>('.ui-file-state-done')!;
+    const saving = item.compressedBlob ? Math.max(0, Math.round((1 - item.compressedBlob.size / item.file.size) * 100)) : 0;
+    doneState.classList.add('ui-file-state-visible');
+    doneState.querySelector<HTMLElement>('.ui-file-state-text-format')!.textContent = `-${saving}%`;
     button.classList.remove('ui-file-button-hidden');
     button.disabled = false;
     buttonText.textContent = `${formatBytes(item.compressedBlob?.size ?? 0)} - SAVE`;
