@@ -48,8 +48,13 @@ const zoomIndicator = mustGet<HTMLButtonElement>('ui-zoomIndicator');
 let items: FileItem[] = [];
 let selectedId: string | null = null;
 let split = 0.5;
+let zoom = 1;
 let draggingSplit = false;
 let processing = false;
+const bitmapCache = new Map<string, Promise<ImageBitmap>>();
+
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 10;
 
 function mustGet<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -234,6 +239,7 @@ function downloadAll(): void {
 }
 
 function selectItem(id: string | null): void {
+  if (selectedId !== id) resetZoom(false);
   selectedId = id;
   for (const item of items) item.card.style.outline = item.id === id ? '3px solid var(--color-primary)' : '';
   void renderSelected();
@@ -263,21 +269,24 @@ async function drawComparison(originalUrl: string, compressedUrl: string): Promi
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawContain(ctx, compressed, canvas.width, canvas.height);
+  drawZoomedContain(ctx, compressed, canvas.width, canvas.height);
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, canvas.width * split, canvas.height);
   ctx.clip();
-  drawContain(ctx, original, canvas.width, canvas.height);
+  drawZoomedContain(ctx, original, canvas.width, canvas.height);
   ctx.restore();
-  original.close();
-  compressed.close();
   positionThumb();
+  updateZoomIndicator();
 }
 
 async function loadBitmap(url: string): Promise<ImageBitmap> {
-  const response = await fetch(url);
-  return createImageBitmap(await response.blob());
+  let bitmapPromise = bitmapCache.get(url);
+  if (!bitmapPromise) {
+    bitmapPromise = fetch(url).then(async (response) => createImageBitmap(await response.blob()));
+    bitmapCache.set(url, bitmapPromise);
+  }
+  return bitmapPromise;
 }
 
 function resizeCanvas(): void {
@@ -287,11 +296,31 @@ function resizeCanvas(): void {
   canvas.height = Math.max(1, Math.round(rect.height * ratio));
 }
 
-function drawContain(ctx: CanvasRenderingContext2D, image: ImageBitmap, width: number, height: number): void {
-  const scale = Math.min(width / image.width, height / image.height);
+function drawZoomedContain(ctx: CanvasRenderingContext2D, image: ImageBitmap, width: number, height: number): void {
+  const scale = Math.min(width / image.width, height / image.height) * zoom;
   const drawWidth = image.width * scale;
   const drawHeight = image.height * scale;
   ctx.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+}
+
+function updateZoomIndicator(): void {
+  const zoomPercent = Math.round(zoom * 100);
+  zoomIndicator.querySelector<HTMLElement>('.ui-zoom-indicator-text')!.textContent = `${zoomPercent}%`;
+  zoomIndicator.classList.toggle('ui-zoom-indicator-hidden', zoom === 1);
+}
+
+function resetZoom(render = true): void {
+  zoom = 1;
+  updateZoomIndicator();
+  if (render) void renderSelected();
+}
+
+function handleZoom(event: WheelEvent): void {
+  if (!comparisonPanel.classList.contains('ui-settings-visible')) return;
+  event.preventDefault();
+  const factor = Math.exp(-event.deltaY * 0.0015);
+  zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * factor));
+  void renderSelected();
 }
 
 function positionThumb(): void {
@@ -351,7 +380,8 @@ prevBtn.addEventListener('click', () => filesScroll.scrollBy({ left: -300, behav
 nextBtn.addEventListener('click', () => filesScroll.scrollBy({ left: 300, behavior: 'smooth' }));
 filesScroll.addEventListener('scroll', updateScrollButtons);
 window.addEventListener('resize', () => void renderSelected());
-zoomIndicator.addEventListener('click', () => void renderSelected());
+zoomIndicator.addEventListener('click', () => resetZoom());
+canvas.addEventListener('wheel', handleZoom, { passive: false });
 
 dropZone.addEventListener('dragover', (event) => {
   event.preventDefault();
