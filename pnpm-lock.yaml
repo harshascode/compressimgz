@@ -11,6 +11,9 @@ importers:
       '@jsquash/jpeg':
         specifier: ^1.6.0
         version: 1.6.0
+      '@jsquash/png':
+        specifier: ^3.1.1
+        version: 3.1.1
     devDependencies:
       typescript:
         specifier: ~6.0.2
@@ -32,6 +35,9 @@ packages:
 
   '@jsquash/jpeg@1.6.0':
     resolution: {integrity: sha512-zwN46Awh1VM6gXlIcALwb5WzqK5H2e6+Awcs1QP8AvS8ohsK/sbE4esvmH4jhlhW7+CgiUUww66vg0aTnlSIMA==}
+
+  '@jsquash/png@3.1.1':
+    resolution: {integrity: sha512-C10pc+0H6j0h8fENOfnGOvkXCmvpSQTDGlfGd0sHphZhPSGTyLjIrHba0FaZZdsKqA/wlmhYicUHb92vfZphaw==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -334,6 +340,8 @@ snapshots:
     optional: true
 
   '@jsquash/jpeg@1.6.0': {}
+
+  '@jsquash/png@3.1.1': {}
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
