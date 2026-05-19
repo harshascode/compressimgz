@@ -14,12 +14,9 @@ importers:
       '@jsquash/oxipng':
         specifier: ^2.3.0
         version: 2.3.0
-      '@jsquash/png':
-        specifier: ^3.1.1
-        version: 3.1.1
-      image-q:
-        specifier: ^4.0.0
-        version: 4.0.0
+      imagequant:
+        specifier: ^0.1.2
+        version: 0.1.2
     devDependencies:
       typescript:
         specifier: ~6.0.2
@@ -44,9 +41,6 @@ packages:
 
   '@jsquash/oxipng@2.3.0':
     resolution: {integrity: sha512-aQ8wiEp6ztlTMXc+RMt/CG8crU3mEHDU+h+JYkIi6ctMhlh8+Ltj5XwQFfBuyzKYrp8NxaFW80Dp824bqjr+zA==}
-
-  '@jsquash/png@3.1.1':
-    resolution: {integrity: sha512-C10pc+0H6j0h8fENOfnGOvkXCmvpSQTDGlfGd0sHphZhPSGTyLjIrHba0FaZZdsKqA/wlmhYicUHb92vfZphaw==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -158,9 +152,6 @@ packages:
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
 
-  '@types/node@16.9.1':
-    resolution: {integrity: sha512-QpLcX9ZSsq3YYUUnD3nFDY8H7wctAhQj/TFKL8Ya8v5fMm3CFXxo8zStsLAl780ltoYoo1WvKUVGBQK+1ifr7g==}
-
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
@@ -179,8 +170,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  image-q@4.0.0:
-    resolution: {integrity: sha512-PfJGVgIfKQJuq3s0tTDOKtztksibuUEbJQIYT3by6wctQo+Rdlh7ef4evJ5NCdxY4CfMbvFkocEwbl4BF8RlJw==}
+  imagequant@0.1.2:
+    resolution: {integrity: sha512-7Q3B6vcDJEc+DKcfKises04XymMwP6mlfv2ShXQd/OaJaV1mum7mYueLEeaxRxwCjjn+M9pugnct9vne7r2A8A==}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -363,8 +354,6 @@ snapshots:
     dependencies:
       wasm-feature-detect: 1.8.0
 
-  '@jsquash/png@3.1.1': {}
-
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
       '@emnapi/core': 1.10.0
@@ -430,8 +419,6 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@types/node@16.9.1': {}
-
   detect-libc@2.1.2: {}
 
   fdir@6.5.0(picomatch@4.0.4):
@@ -441,9 +428,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  image-q@4.0.0:
-    dependencies:
-      '@types/node': 16.9.1
+  imagequant@0.1.2: {}
 
   lightningcss-android-arm64@1.32.0:
     optional: true
