@@ -11,12 +11,12 @@ importers:
       '@jsquash/jpeg':
         specifier: ^1.6.0
         version: 1.6.0
-      '@jsquash/oxipng':
-        specifier: ^2.3.0
-        version: 2.3.0
-      libimagequant-wasm:
-        specifier: ^0.3.0
-        version: 0.3.0
+      '@jsquash/png':
+        specifier: ^3.1.1
+        version: 3.1.1
+      image-q:
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       typescript:
         specifier: ~6.0.2
@@ -39,8 +39,8 @@ packages:
   '@jsquash/jpeg@1.6.0':
     resolution: {integrity: sha512-zwN46Awh1VM6gXlIcALwb5WzqK5H2e6+Awcs1QP8AvS8ohsK/sbE4esvmH4jhlhW7+CgiUUww66vg0aTnlSIMA==}
 
-  '@jsquash/oxipng@2.3.0':
-    resolution: {integrity: sha512-aQ8wiEp6ztlTMXc+RMt/CG8crU3mEHDU+h+JYkIi6ctMhlh8+Ltj5XwQFfBuyzKYrp8NxaFW80Dp824bqjr+zA==}
+  '@jsquash/png@3.1.1':
+    resolution: {integrity: sha512-C10pc+0H6j0h8fENOfnGOvkXCmvpSQTDGlfGd0sHphZhPSGTyLjIrHba0FaZZdsKqA/wlmhYicUHb92vfZphaw==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -152,6 +152,9 @@ packages:
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
 
+  '@types/node@16.9.1':
+    resolution: {integrity: sha512-QpLcX9ZSsq3YYUUnD3nFDY8H7wctAhQj/TFKL8Ya8v5fMm3CFXxo8zStsLAl780ltoYoo1WvKUVGBQK+1ifr7g==}
+
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
@@ -170,9 +173,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  libimagequant-wasm@0.3.0:
-    resolution: {integrity: sha512-0Rp+iwbWBBcU1dan9cFpzDPxXS5u5Dpf51Bu1k6JV1FfVHV1QfNbZiPo8GD45HmTSx/3hPwi/dCeNv2cw3nJHg==}
-    engines: {node: '>=20.19.0'}
+  image-q@4.0.0:
+    resolution: {integrity: sha512-PfJGVgIfKQJuq3s0tTDOKtztksibuUEbJQIYT3by6wctQo+Rdlh7ef4evJ5NCdxY4CfMbvFkocEwbl4BF8RlJw==}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -328,9 +330,6 @@ packages:
       yaml:
         optional: true
 
-  wasm-feature-detect@1.8.0:
-    resolution: {integrity: sha512-zksaLKM2fVlnB5jQQDqKXXwYHLQUVH9es+5TOOHwGOVJOCeRBCiPjwSg+3tN2AdTCzjgli4jijCH290kXb/zWQ==}
-
 snapshots:
 
   '@emnapi/core@1.10.0':
@@ -351,9 +350,7 @@ snapshots:
 
   '@jsquash/jpeg@1.6.0': {}
 
-  '@jsquash/oxipng@2.3.0':
-    dependencies:
-      wasm-feature-detect: 1.8.0
+  '@jsquash/png@3.1.1': {}
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -420,6 +417,8 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@types/node@16.9.1': {}
+
   detect-libc@2.1.2: {}
 
   fdir@6.5.0(picomatch@4.0.4):
@@ -429,7 +428,9 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  libimagequant-wasm@0.3.0: {}
+  image-q@4.0.0:
+    dependencies:
+      '@types/node': 16.9.1
 
   lightningcss-android-arm64@1.32.0:
     optional: true
@@ -534,5 +535,3 @@ snapshots:
       tinyglobby: 0.2.16
     optionalDependencies:
       fsevents: 2.3.3
-
-  wasm-feature-detect@1.8.0: {}
