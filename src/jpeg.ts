@@ -1,7 +1,7 @@
 import { initImageCompressor } from './image-compressor';
 
 initImageCompressor({
-  workerUrl: new URL('./jpeg-worker.ts', import.meta.url),
+  createWorker: () => new Worker(new URL('./jpeg-worker.ts', import.meta.url), { type: 'module' }),
   workerErrorLabel: 'JPEG',
   mimeType: 'image/jpeg',
   filePattern: /\.jpe?g$/i,

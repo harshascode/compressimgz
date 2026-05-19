@@ -12,7 +12,7 @@ type FileItem = {
 };
 
 export type ImageCompressorConfig = {
-  workerUrl: URL;
+  createWorker: () => Worker;
   workerErrorLabel: string;
   mimeType: string;
   filePattern: RegExp;
@@ -65,7 +65,7 @@ let zoom = 1;
 let draggingSplit = false;
 let processing = false;
 const bitmapCache = new Map<string, Promise<ImageBitmap>>();
-const imageWorker = new Worker(config.workerUrl, { type: 'module' });
+const imageWorker = config.createWorker();
 let nextWorkerRequestId = 1;
 const workerRequests = new Map<number, {
   resolve: (buffer: ArrayBuffer) => void;

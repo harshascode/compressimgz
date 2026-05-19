@@ -1,0 +1,14 @@
+import { resolve } from 'node:path';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        index: resolve(__dirname, 'index.html'),
+        jpeg: resolve(__dirname, 'jpeg.html'),
+        png: resolve(__dirname, 'png.html'),
+      },
+    },
+  },
+});
