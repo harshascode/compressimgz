@@ -1,0 +1,135 @@
+libimagequant-wasm
+A TypeScript/JavaScript WebAssembly wrapper for the libimagequant image quantization library. This package provides high-quality image color quantization in the browser using Web Workers for optimal performance.
+
+Features
+High-quality image quantization - Convert 24/32-bit images to 8-bit palette with alpha channel
+Web Worker support - Non-blocking image processing using Web Workers
+TypeScript support - Full TypeScript definitions included
+Promise-based API - Modern, easy-to-use async interface
+Optimized WASM - Size and performance optimized WebAssembly build
+Browser compatible - Works in all modern browsers supporting WebAssembly
+Multiple formats - Supports ESM and CommonJS
+Installation
+
+Copy code
+npm install libimagequant-wasm
+Requirements
+Node.js >= 20.19.0
+Modern browser with WebAssembly and Web Worker support
+Quick Start
+Quantize a PNG
+
+Copy code
+import LibImageQuant from 'libimagequant-wasm';
+
+const quantizer = new LibImageQuant();
+
+// Fetch a PNG and quantize it
+const response = await fetch('image.png');
+const pngData = new Uint8Array(await response.arrayBuffer());
+
+const result = await quantizer.quantizePng(pngData, {
+  maxColors: 64,
+  quality: { min: 0, target: 100 },
+  speed: 3,
+});
+
+console.log(`Quantized to ${result.paletteLength} colors`);
+console.log(`Quality: ${Math.round(result.quality * 100)}%`);
+
+// result.pngBytes - quantized indexed PNG as Uint8Array
+// result.imageData - quantized image as ImageData (for canvas rendering)
+
+quantizer.dispose();
+Quantize from Canvas
+
+Copy code
+import LibImageQuant from 'libimagequant-wasm';
+
+const quantizer = new LibImageQuant();
+
+const canvas = document.getElementById('myCanvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d')!;
+const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+const result = await quantizer.quantizeImageData(imageData, {
+  maxColors: 32,
+  speed: 1,
+  dithering: 0.8,
+});
+
+// Draw quantized result back to canvas
+ctx.putImageData(result.imageData, 0, 0);
+
+quantizer.dispose();
+Input Formats
+quantizePng accepts multiple input types:
+
+
+Copy code
+// Uint8Array
+const result = await quantizer.quantizePng(pngBytes);
+
+// ArrayBuffer
+const result = await quantizer.quantizePng(arrayBuffer);
+
+// Blob
+const result = await quantizer.quantizePng(blob);
+API Reference
+LibImageQuant
+Constructor
+
+Copy code
+const quantizer = new LibImageQuant(options?: LibImageQuantOptions);
+Option	Type	Default	Description
+workerUrl	string	auto-detected	Custom path to the worker module
+wasmUrl	string	auto-detected	Custom path to the WASM module directory
+initTimeout	number	10000	Worker initialization timeout (ms)
+operationTimeout	number	30000	Per-operation timeout (ms)
+Methods
+quantizePng(pngData, options?)
+Quantizes a PNG image from binary data.
+
+pngData: Uint8Array | ArrayBuffer | Blob - PNG file bytes
+options: QuantizationOptions (optional)
+Returns: Promise<QuantizationResult>
+quantizeImageData(imageData, options?)
+Quantizes an ImageData object (e.g. from canvas).
+
+imageData: ImageData - RGBA image data
+options: QuantizationOptions (optional)
+Returns: Promise<QuantizationResult>
+dispose()
+Terminates the worker, rejects any pending operations, and releases resources. Safe to call multiple times.
+
+QuantizationOptions
+
+Copy code
+{
+  speed?: number;          // Speed vs quality (1-10, lower = better quality)
+  quality?: {
+    min: number;           // Minimum acceptable quality (0-100)
+    target: number;        // Target quality (0-100)
+  };
+  maxColors?: number;      // Maximum colors in palette (2-256)
+  dithering?: number;      // Dithering level (0.0-1.0)
+  posterization?: number;  // Posterization level (0-4)
+}
+QuantizationResult
+
+Copy code
+{
+  palette: number[][];     // Color palette as [[r,g,b,a], ...]
+  pngBytes: Uint8Array;    // Quantized indexed PNG file bytes
+  imageData: ImageData;    // Quantized RGBA image data (for canvas)
+  quality: number;         // Achieved quality (0.0-1.0)
+  paletteLength: number;   // Number of colors in palette
+  width: number;           // Image width in pixels
+  height: number;          // Image height in pixels
+}
+
+Performance Tips
+Reuse quantizer instances when processing multiple images
+Use appropriate speed settings - higher speed for real-time, lower for final output
+Consider image size - quantization time scales with pixel count
+Call dispose() when done to release the Web Worker
