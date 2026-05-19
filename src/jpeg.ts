@@ -204,13 +204,9 @@ function setCardState(item: FileItem, status: Status, detail = ''): void {
   const image = card.querySelector<HTMLImageElement>('.ui-file-image')!;
   const button = card.querySelector<HTMLButtonElement>('.ui-file-button')!;
   const buttonText = card.querySelector<HTMLSpanElement>('.ui-file-button-text')!;
-  const buttonProgress = card.querySelector<HTMLSpanElement>('.ui-file-button-progress')!;
 
   button.classList.add('ui-file-button-hidden');
   button.disabled = true;
-  buttonText.textContent = '';
-  buttonProgress.style.width = '0%';
-  buttonProgress.classList.add('ui-file-button-progress-hidden');
   image.classList.remove('ui-file-image-hidden');
 
   if (status === 'pending') {
@@ -219,8 +215,6 @@ function setCardState(item: FileItem, status: Status, detail = ''): void {
     card.querySelector('.ui-file-state-converting')!.classList.add('ui-file-state-visible');
     button.classList.remove('ui-file-button-hidden');
     buttonText.textContent = 'PROCESSING...';
-    buttonProgress.classList.remove('ui-file-button-progress-hidden');
-    buttonProgress.style.width = '100%';
   } else if (status === 'error') {
     const errorState = card.querySelector<HTMLElement>('.ui-file-state-error')!;
     errorState.classList.add('ui-file-state-visible', 'file__state_visible');
