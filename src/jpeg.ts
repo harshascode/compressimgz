@@ -1,12 +1,9 @@
-import { decode, encode } from '@jsquash/jpeg';
-
 type Status = 'pending' | 'processing' | 'done' | 'error';
 
 type FileItem = {
   id: string;
   file: File;
   originalUrl: string;
-  originalImageData?: ImageData;
   compressedBlob?: Blob;
   compressedUrl?: string;
   quality: number;
@@ -57,6 +54,37 @@ let zoom = 1;
 let draggingSplit = false;
 let processing = false;
 const bitmapCache = new Map<string, Promise<ImageBitmap>>();
+const jpegWorker = new Worker(new URL('./jpeg-worker.ts', import.meta.url), { type: 'module' });
+let nextWorkerRequestId = 1;
+const workerRequests = new Map<number, {
+  resolve: (buffer: ArrayBuffer) => void;
+  reject: (error: Error) => void;
+}>();
+
+type WorkerRequest = {
+  type: 'compress';
+  requestId: number;
+  itemId: string;
+  buffer: ArrayBuffer;
+  quality: number;
+} | {
+  type: 'release';
+  itemId: string;
+} | {
+  type: 'clear';
+};
+
+type WorkerResponse = {
+  type: 'compressed';
+  requestId: number;
+  itemId: string;
+  buffer: ArrayBuffer;
+} | {
+  type: 'error';
+  requestId: number;
+  itemId: string;
+  message: string;
+};
 
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 10;
@@ -65,6 +93,46 @@ function mustGet<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
   if (!element) throw new Error(`Missing element #${id}`);
   return element as T;
+}
+
+jpegWorker.addEventListener('message', (event: MessageEvent<WorkerResponse>) => {
+  const message = event.data;
+  const request = workerRequests.get(message.requestId);
+  if (!request) return;
+
+  workerRequests.delete(message.requestId);
+  if (message.type === 'compressed') {
+    request.resolve(message.buffer);
+  } else {
+    request.reject(new Error(message.message));
+  }
+});
+
+jpegWorker.addEventListener('error', (event) => {
+  for (const [requestId, request] of workerRequests) {
+    request.reject(new Error(event.message || 'JPEG worker failed.'));
+    workerRequests.delete(requestId);
+  }
+});
+
+function postWorkerMessage(message: WorkerRequest, transfer?: Transferable[]): void {
+  jpegWorker.postMessage(message, transfer ?? []);
+}
+
+async function encodeJpegInWorker(item: FileItem, quality: number): Promise<ArrayBuffer> {
+  const requestId = nextWorkerRequestId++;
+  const buffer = await item.file.arrayBuffer();
+
+  return new Promise((resolve, reject) => {
+    workerRequests.set(requestId, { resolve, reject });
+    postWorkerMessage({
+      type: 'compress',
+      requestId,
+      itemId: item.id,
+      buffer,
+      quality,
+    }, [buffer]);
+  });
 }
 
 function formatBytes(bytes: number): string {
@@ -239,6 +307,7 @@ function removeItem(id: string): void {
   if (!item) return;
   URL.revokeObjectURL(item.originalUrl);
   if (item.compressedUrl) URL.revokeObjectURL(item.compressedUrl);
+  postWorkerMessage({ type: 'release', itemId: item.id });
   const imgUrl = item.card.querySelector<HTMLImageElement>('.ui-file-image')?.src;
   if (imgUrl) URL.revokeObjectURL(imgUrl);
   item.card.remove();
@@ -255,17 +324,8 @@ function clearAll(): void {
 async function compressItem(item: FileItem, quality = item.quality): Promise<void> {
   setCardState(item, 'processing');
   try {
-    const imageData = item.originalImageData ?? await decode(await item.file.arrayBuffer(), { preserveOrientation: true });
-    item.originalImageData = imageData;
-    const buffer = await encode(imageData, {
-      quality,
-      progressive: true,
-      optimize_coding: true,
-      trellis_multipass: true,
-      trellis_opt_zero: true,
-      trellis_opt_table: true,
-      auto_subsample: true,
-    });
+    const buffer = await encodeJpegInWorker(item, quality);
+    if (!items.includes(item)) return;
     if (item.compressedUrl) URL.revokeObjectURL(item.compressedUrl);
     item.quality = quality;
 
