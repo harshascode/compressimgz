@@ -45,6 +45,11 @@ const applyQualityBtn = mustGet<HTMLButtonElement>('ui-applyQualityBtn');
 const settingsLoader = mustGet<HTMLSpanElement>('ui-settingsLoader');
 const zoomIndicator = mustGet<HTMLButtonElement>('ui-zoomIndicator');
 
+type Language = {
+  code: string;
+  name: string;
+};
+
 let items: FileItem[] = [];
 let selectedId: string | null = null;
 let split = 0.5;
@@ -71,6 +76,70 @@ function formatBytes(bytes: number): string {
 
 function outputName(name: string): string {
   return name.replace(/\.(jpe?g)$/i, '') + '-compressed.jpg';
+}
+
+function getLanguageHref(code: string, currentLang: string, currentPath: string): string {
+  let path = currentPath || window.location.pathname || '/';
+  if (!path.startsWith('/')) path = `/${path}`;
+
+  if (currentLang !== 'en') {
+    path = path.replace(new RegExp(`^/${currentLang}(?=/|$)`), '') || '/';
+  }
+
+  return code === 'en' ? path : `/${code}${path === '/' ? '/' : path}`;
+}
+
+function initLanguageSelectors(): void {
+  document.querySelectorAll<HTMLElement>('.ui-language').forEach((selector) => {
+    const button = selector.querySelector<HTMLButtonElement>('.ui-language-button');
+    const list = selector.querySelector<HTMLUListElement>('.ui-language-list');
+    const encodedLanguages = selector.dataset.languages;
+    if (!button || !list || !encodedLanguages) return;
+
+    let languages: Language[] = [];
+    try {
+      languages = JSON.parse(decodeURIComponent(encodedLanguages)) as Language[];
+    } catch {
+      return;
+    }
+
+    const currentLang = selector.dataset.currentLang || document.documentElement.lang || 'en';
+    const currentPath = selector.dataset.currentPath || window.location.pathname || '/';
+    button.type = 'button';
+    button.setAttribute('aria-haspopup', 'true');
+    button.setAttribute('aria-expanded', 'false');
+
+    list.replaceChildren(...languages.map((language) => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.className = 'ui-language-title';
+      link.href = getLanguageHref(language.code, currentLang, currentPath);
+      link.textContent = language.name;
+      link.lang = language.code;
+      if (language.code === currentLang) {
+        link.classList.add('ui-language-title-selected');
+        link.setAttribute('aria-current', 'true');
+      }
+      item.append(link);
+      return item;
+    }));
+
+    const setOpen = (open: boolean) => {
+      selector.classList.toggle('ui-language-active', open);
+      button.setAttribute('aria-expanded', String(open));
+    };
+
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setOpen(!selector.classList.contains('ui-language-active'));
+    });
+
+    selector.addEventListener('click', (event) => event.stopPropagation());
+    document.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    });
+  });
 }
 
 function isJpeg(file: File): boolean {
@@ -135,15 +204,23 @@ function setCardState(item: FileItem, status: Status, detail = ''): void {
   const image = card.querySelector<HTMLImageElement>('.ui-file-image')!;
   const button = card.querySelector<HTMLButtonElement>('.ui-file-button')!;
   const buttonText = card.querySelector<HTMLSpanElement>('.ui-file-button-text')!;
+  const buttonProgress = card.querySelector<HTMLSpanElement>('.ui-file-button-progress')!;
 
   button.classList.add('ui-file-button-hidden');
   button.disabled = true;
+  buttonText.textContent = '';
+  buttonProgress.style.width = '0%';
+  buttonProgress.classList.add('ui-file-button-progress-hidden');
   image.classList.remove('ui-file-image-hidden');
 
   if (status === 'pending') {
     card.querySelector('.ui-file-state-pending')!.classList.add('ui-file-state-visible');
   } else if (status === 'processing') {
     card.querySelector('.ui-file-state-converting')!.classList.add('ui-file-state-visible');
+    button.classList.remove('ui-file-button-hidden');
+    buttonText.textContent = 'PROCESSING...';
+    buttonProgress.classList.remove('ui-file-button-progress-hidden');
+    buttonProgress.style.width = '100%';
   } else if (status === 'error') {
     const errorState = card.querySelector<HTMLElement>('.ui-file-state-error')!;
     errorState.classList.add('ui-file-state-visible', 'file__state_visible');
@@ -419,4 +496,5 @@ thumb.addEventListener('pointerup', (event) => {
 });
 canvas.addEventListener('pointerdown', setSplitFromEvent);
 
+initLanguageSelectors();
 updateUi();
