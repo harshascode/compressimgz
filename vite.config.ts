@@ -11,6 +11,7 @@ export default defineConfig({
         png: fileURLToPath(new URL('png.html', import.meta.url)),
         webp: fileURLToPath(new URL('webp.html', import.meta.url)),
         avif: fileURLToPath(new URL('avif.html', import.meta.url)),
+        gif: fileURLToPath(new URL('gif.html', import.meta.url)),
       },
     },
   },
