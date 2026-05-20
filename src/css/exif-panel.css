@@ -1,0 +1,301 @@
+/**
+ * EXIF Panel styles for exif-viewer and exif-remover apps
+ * Use with base.ui-css
+ */
+
+/* ========== Settings Panel (simplified for EXIF apps) ========== */
+.ui-settings {
+  display: none;
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto 40px;
+  background: #fff;
+  border-radius: 0.75em;
+  border: 1px solid #f2f2f2;
+  box-shadow: 0 5px 16px -2px rgba(42, 115, 217, 0.2);
+  font-size: 16px;
+}
+
+.ui-settings-visible {
+  display: block;
+}
+
+.ui-page-settings {
+  margin-top: 0;
+}
+
+.ui-settings-header {
+  border-bottom: 1px solid #f2f2f2;
+  padding: 0.5em 1em;
+}
+
+.ui-settings-title {
+  position: relative;
+  text-align: center;
+}
+
+.ui-settings-status {
+  text-align: center;
+  font-size: 1.125em;
+  font-weight: 600;
+  color: var(--color-success);
+  margin: 0.5em 0 0;
+}
+
+.ui-settings-status:empty {
+  display: none;
+}
+
+.ui-settings-title-text {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-size: 1.125em;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.ui-settings-content {
+  padding: 1.5em;
+}
+
+.ui-settings-loader-outer {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5em;
+  height: 2.5em;
+}
+
+/* ========== EXIF Panel Component ========== */
+.ui-exif-panel {
+  width: 100%;
+}
+
+.ui-exif-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+  padding-bottom: 1em;
+  border-bottom: 2px solid #f2f2f2;
+  gap: 1em;
+}
+
+.ui-exif-panel-search {
+  position: relative;
+  flex: 1 1 auto;
+  max-width: 400px;
+}
+
+.ui-exif-panel-search-icon {
+  position: absolute;
+  left: 0.875em;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.125em;
+  height: 1.125em;
+  fill: #9ca0a5;
+  pointer-events: none;
+}
+
+.ui-exif-panel-search-input {
+  width: 100%;
+  padding: 0.625em 2.25em 0.625em 2.75em;
+  border: 2px solid #e3edfa;
+  border-radius: 6px;
+  font-size: 0.875em;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+}
+
+.ui-exif-panel-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(42, 115, 217, 0.1);
+}
+
+.ui-exif-panel-search-clear {
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25em;
+  cursor: pointer;
+  color: #999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-exif-panel-search-clear svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+.ui-exif-panel-search-clear:hover {
+  color: var(--color-danger);
+}
+
+.ui-exif-panel-search-input:not(:placeholder-shown) ~ .ui-exif-panel-search-clear {
+  display: flex;
+}
+
+.ui-exif-panel-remove-btn {
+  flex-shrink: 0;
+}
+
+.ui-exif-panel-table-container {
+  background: #fff;
+  position: relative;
+}
+
+.ui-exif-panel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875em;
+}
+
+.ui-exif-panel-th {
+  text-align: left;
+  padding: 1em 1.25em;
+  background: #999;
+  font-weight: 700;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.ui-exif-panel-th:first-child {
+  width: 35%;
+}
+
+.ui-exif-panel-td {
+  padding: 0.75em 1.25em;
+  vertical-align: top;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.ui-exif-panel-td-tag {
+  font-weight: 600;
+  color: var(--color-dark);
+  word-break: break-word;
+}
+
+.ui-exif-panel-td-value {
+  color: #666;
+  word-break: break-all;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  font-size: 0.95em;
+}
+
+.ui-exif-panel-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.ui-exif-panel-no-results {
+  text-align: center;
+  padding: 3em 2em;
+  color: #9ca0a5;
+  font-style: italic;
+}
+
+.ui-exif-panel-empty {
+  text-align: center;
+  padding: 4em 2em;
+  color: #9ca0a5;
+  font-size: 1.125em;
+}
+
+.ui-exif-panel-empty p {
+  margin: 0;
+}
+
+.ui-exif-panel-empty-success {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+/* ========== File state for EXIF apps ========== */
+.ui-file-state-text-tags {
+  font-size: 2em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ui-file-tags-label {
+  font-size: 0.5em;
+  opacity: 0.8;
+  text-transform: lowercase;
+}
+
+.ui-file-download {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  bottom: 0.5em;
+  left: 0.5em;
+  right: 0.5em;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background-color: rgba(200, 230, 200, 0.85);
+  color: #000;
+  text-shadow: 0px 0px 2px #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 10px 8px -8px rgba(0, 0, 0, 0.125);
+  cursor: pointer;
+  opacity: 0.95;
+  transition: background-color 0.2s ease-out;
+}
+
+.ui-file-download:hover {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.ui-file-has-download .ui-file-download {
+  display: block;
+}
+
+/* ========== Responsive ========== */
+@media screen and (max-width: 768px) {
+  .ui-exif-panel-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1em;
+  }
+
+  .ui-exif-panel-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .ui-exif-panel-remove-btn {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 555px) {
+  .ui-settings-content {
+    padding: 1em;
+  }
+
+  .ui-exif-panel-th {
+    padding: 0.75em 0.875em;
+    font-size: 0.875em;
+  }
+
+  .ui-exif-panel-td {
+    padding: 0.625em 0.875em;
+    font-size: 0.8125em;
+  }
+}

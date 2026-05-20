@@ -1,0 +1,170 @@
+/**
+ * ExifRemover theme overrides
+ * Muted color scheme + horizontal header layout + gray language selector
+ */
+
+/* ========== Theme Colors ========== */
+:root {
+  --color-primary: #608DBC;
+  --color-success: #679364;
+  --color-danger: #A37AAB;
+}
+
+/* ========== Body Adjustment ========== */
+body {
+  padding-top: 1.5em;
+}
+
+/* ========== Header Layout (horizontal with logo) ========== */
+.ui-header {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  justify-content: space-between;
+}
+
+.ui-header-left {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.ui-header-right {
+  position: relative;
+  flex-shrink: 0;
+  width: 300px;
+  height: 250px;
+  margin-left: 2em;
+}
+
+@media screen and (max-width: 900px) {
+  .ui-header-right {
+    display: none;
+  }
+}
+
+.ui-header-logo {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 1.5em;
+}
+
+.ui-header-language {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ui-header-text {
+  line-height: 1.4;
+  font-size: 1.07em;
+  margin-bottom: 5px;
+}
+
+.ui-header-text-hidden-sm {
+  display: block;
+}
+
+@media screen and (max-width: 555px) {
+  .ui-header {
+    width: auto;
+    margin-right: -10px;
+    margin-left: -10px;
+  }
+  .ui-header-language {
+    top: 0.5em;
+  }
+  .ui-header-left {
+    padding-top: 0.5em;
+  }
+  .ui-header-logo {
+    width: calc(90% - 4.5em);
+    height: auto;
+  }
+  .ui-header-text {
+    text-align: center;
+  }
+  .ui-header-text-hidden-sm {
+    display: none;
+  }
+}
+
+/* ========== Gray Language Selector ========== */
+.ui-language-button {
+  color: #333;
+  border: 1px solid #333;
+}
+
+.ui-language-button:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.ui-language-overflow {
+  border: 1px solid #333;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.ui-language-title:hover {
+  background-color: #f0f0f0;
+}
+
+.ui-language-title-selected {
+  color: #333;
+}
+
+.ui-language-active .ui-language-button {
+  background-color: #333;
+  color: #fff;
+}
+
+/* ========== Article Color Overrides (muted palette) ========== */
+.ui-article-highlight {
+  background: linear-gradient(135deg, #e8f1f8 0%, #d5e4f0 100%);
+  border-left: 4px solid #608DBC;
+}
+
+.ui-article-highlight strong {
+  color: #4a7099;
+}
+
+.ui-article-tip {
+  background: linear-gradient(135deg, #e8f2e7 0%, #d8ebd6 100%);
+  border-left: 4px solid #679364;
+}
+
+.ui-article-tip strong {
+  color: #527550;
+}
+
+.ui-article-warning {
+  background: linear-gradient(135deg, #f8f3e6 0%, #f0e6cc 100%);
+  border-left: 4px solid #C9A857;
+}
+
+.ui-article-warning strong {
+  color: #9a8242;
+}
+
+.ui-article-example {
+  background: linear-gradient(135deg, #f3eef5 0%, #e8dded 100%);
+  border-left: 4px solid #A37AAB;
+}
+
+.ui-article-example h4 {
+  color: #825e89;
+}
+
+.ui-article-table-colored thead {
+  background: linear-gradient(135deg, #608DBC 0%, #4a7099 100%);
+}
+
+.ui-article-table-colored tbody tr:nth-child(odd) {
+  background: #f6f9fb;
+}
+
+.ui-article-table-colored tbody tr:hover {
+  background: #e8f1f8;
+}
