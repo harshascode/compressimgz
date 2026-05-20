@@ -1,14 +1,15 @@
-import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+// vite.config.ts
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        index: resolve(__dirname, 'index.html'),
-        jpeg: resolve(__dirname, 'jpeg.html'),
-        png: resolve(__dirname, 'png.html'),
+        index: fileURLToPath(new URL('index.html', import.meta.url)),
+        jpeg: fileURLToPath(new URL('jpeg.html', import.meta.url)),
+        png: fileURLToPath(new URL('png.html', import.meta.url)),
       },
     },
   },
-});
+})
