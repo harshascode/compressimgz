@@ -60,20 +60,23 @@ ctx.addEventListener('message', async (event: MessageEvent<WorkerRequest>) => {
       const imagequantImage = new ImagequantImage(pixels, width, height, 0);
       const quantizer = new Imagequant();
 
-      // Map your UI slider quality (10 - 100) to Imagequant's internal bounds
+      // --- OPTIMIZATION SETTINGS FOR SMALLER FILE SIZE ---
+      // 1. Force the engine to use speed 1 (slowest/deepest compression search)
+      quantizer.set_speed(1);
+
+      // 2. Map your UI slider quality to Imagequant's internal bounds
       quantizer.set_quality(0, quality);
 
       // Step D: Run the quantization logic 
       const outputPngBytes = quantizer.process(imagequantImage);
 
       // Step E: Safely extract and slice the underlying buffer 
-      // We explicitly cast the sliced result to ArrayBuffer to satisfy the strict TS compiler
       const outputBuffer = outputPngBytes.buffer.slice(
         outputPngBytes.byteOffset,
         outputPngBytes.byteOffset + outputPngBytes.byteLength
       ) as ArrayBuffer;
 
-      // Step F: Respond back to the main UI orchestrator with zero-copy memory allocation transfers
+      // Step F: Respond back to the main UI orchestrator with zero-copy memory transfers
       const response: WorkerResponse = {
         type: 'compressed',
         requestId,
@@ -97,6 +100,6 @@ ctx.addEventListener('message', async (event: MessageEvent<WorkerRequest>) => {
   }
 
   if (message.type === 'release' || message.type === 'clear') {
-    // Memory sweeps clean automatically via V8 garbage collection once variables drop out of scope
+    // Memory sweeps clean automatically via V8 garbage collection
   }
 });
