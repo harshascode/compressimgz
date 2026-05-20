@@ -17,6 +17,9 @@ importers:
       imagequant:
         specifier: ^0.1.2
         version: 0.1.2
+      libimagequant-wasm:
+        specifier: ^0.3.0
+        version: 0.3.0
     devDependencies:
       typescript:
         specifier: ~6.0.2
@@ -172,6 +175,10 @@ packages:
 
   imagequant@0.1.2:
     resolution: {integrity: sha512-7Q3B6vcDJEc+DKcfKises04XymMwP6mlfv2ShXQd/OaJaV1mum7mYueLEeaxRxwCjjn+M9pugnct9vne7r2A8A==}
+
+  libimagequant-wasm@0.3.0:
+    resolution: {integrity: sha512-0Rp+iwbWBBcU1dan9cFpzDPxXS5u5Dpf51Bu1k6JV1FfVHV1QfNbZiPo8GD45HmTSx/3hPwi/dCeNv2cw3nJHg==}
+    engines: {node: '>=20.19.0'}
 
   lightningcss-android-arm64@1.32.0:
     resolution: {integrity: sha512-YK7/ClTt4kAK0vo6w3X+Pnm0D2cf2vPHbhOXdoNti1Ga0al1P4TBZhwjATvjNwLEBCnKvjJc2jQgHXH0NEwlAg==}
@@ -429,6 +436,8 @@ snapshots:
     optional: true
 
   imagequant@0.1.2: {}
+
+  libimagequant-wasm@0.3.0: {}
 
   lightningcss-android-arm64@1.32.0:
     optional: true
