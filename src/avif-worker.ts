@@ -39,7 +39,11 @@ async function compress({ requestId, itemId, buffer, quality }: CompressRequest)
     let imageData = imageCache.get(itemId);
     if (!imageData) {
       // Decode the incoming AVIF or raw image buffer into ImageData
-      imageData = await decode(buffer);
+      const decoded = await decode(buffer);
+      if (!decoded) {
+        throw new Error('Failed to decode AVIF image');
+      }
+      imageData = decoded;
       imageCache.set(itemId, imageData);
     }
 

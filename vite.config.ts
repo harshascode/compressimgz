@@ -1,8 +1,14 @@
-// vite.config.ts
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      'node:fs/promises': fileURLToPath(new URL('src/empty.js', import.meta.url)),
+      'node:fs': fileURLToPath(new URL('src/empty.js', import.meta.url)),
+      'node:path': fileURLToPath(new URL('src/empty.js', import.meta.url)),
+    }
+  },
   build: {
     rollupOptions: {
       input: {
@@ -12,6 +18,7 @@ export default defineConfig({
         webp: fileURLToPath(new URL('webp.html', import.meta.url)),
         avif: fileURLToPath(new URL('avif.html', import.meta.url)),
         gif: fileURLToPath(new URL('gif.html', import.meta.url)),
+        exifremover: fileURLToPath(new URL('exifremover.html', import.meta.url)),
       },
     },
   },
