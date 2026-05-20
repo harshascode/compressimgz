@@ -1,3 +1,8 @@
+// 1. FIX: Mock the DOM Element class so gifsicle-wasm-browser doesn't crash in the Worker thread
+if (typeof (self as any).Element === 'undefined') {
+  (self as any).Element = class {};
+}
+
 import gifsicle from 'gifsicle-wasm-browser';
 
 type CompressRequest = {
@@ -31,26 +36,21 @@ type WorkerResponse = {
   message: string;
 };
 
-// Gifsicle operates directly on arrays of virtual files. 
-// We track original file buffers here in case we need to re-compress.
 const fileCache = new Map<string, ArrayBuffer>();
 const workerScope: Worker = self as unknown as Worker;
 
 async function compress({ requestId, itemId, buffer, quality }: CompressRequest): Promise<void> {
   try {
-    // Cache the original array buffer if it isn't already stored
     let originalBuffer = fileCache.get(itemId);
     if (!originalBuffer) {
       originalBuffer = buffer;
       fileCache.set(itemId, originalBuffer);
     }
 
-    // Convert quality slider value (e.g., 10-100) to Gifsicle lossy value (1-200).
-    // Gifsicle lossy: higher means MORE loss/compression.
-    // If quality is 80, lossy parameter will be: Math.round((100 - 80) * 2) = 40.
+    // Convert quality slider value (10-100) to Gifsicle lossy value (1-200)
     const lossyValue = Math.max(1, Math.min(200, Math.round((100 - quality) * 2)));
 
-    // Execute gifsicle processing using the documented API
+    // Execute gifsicle processing
     const outputFiles = await gifsicle.run({
       input: [{
         file: originalBuffer,
@@ -65,7 +65,6 @@ async function compress({ requestId, itemId, buffer, quality }: CompressRequest)
       throw new Error('Gifsicle optimization did not produce any output files.');
     }
 
-    // Gifsicle returns a standard Web File array. Get the underlying ArrayBuffer.
     const compressedFile = outputFiles[0];
     const encodedBuffer = await compressedFile.arrayBuffer();
 
