@@ -1,14 +1,8 @@
+// vite.config.ts
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      'node:fs/promises': fileURLToPath(new URL('src/empty.js', import.meta.url)),
-      'node:fs': fileURLToPath(new URL('src/empty.js', import.meta.url)),
-      'node:path': fileURLToPath(new URL('src/empty.js', import.meta.url)),
-    }
-  },
   build: {
     rollupOptions: {
       input: {
