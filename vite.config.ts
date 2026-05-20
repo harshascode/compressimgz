@@ -10,6 +10,7 @@ export default defineConfig({
         jpeg: fileURLToPath(new URL('jpeg.html', import.meta.url)),
         png: fileURLToPath(new URL('png.html', import.meta.url)),
         webp: fileURLToPath(new URL('webp.html', import.meta.url)),
+        avif: fileURLToPath(new URL('avif.html', import.meta.url)),
       },
     },
   },
