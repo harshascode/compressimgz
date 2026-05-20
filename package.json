@@ -16,6 +16,7 @@
     "@jsquash/avif": "^2.1.1",
     "@jsquash/jpeg": "^1.6.0",
     "@jsquash/webp": "^1.5.0",
+    "@uswriting/exiftool": "^1.0.9",
     "gifsicle-wasm-browser": "^1.5.19"
   }
 }
