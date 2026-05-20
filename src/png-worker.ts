@@ -1,208 +1,102 @@
-import { optimise } from '@jsquash/oxipng';                                                                                                                                                  
- import initImageQuant, {                                                                                                                                                                     
-   ImageQuantizer,                                                                                                                                                                            
-   decode_png_to_rgba,                                                                                                                                                                        
-   encode_palette_to_png,                                                                                                                                                                     
- } from 'libimagequant-wasm/wasm/libimagequant_wasm.js';                                                                                                                                      
- import imageQuantWasmUrl from './imagequant.wasm?url';                                                                                                                                       
-                                                                                                                                                                                              
- type CompressRequest = {                                                                                                                                                                     
-   type: 'compress';                                                                                                                                                                          
-   requestId: number;                                                                                                                                                                         
-   itemId: string;                                                                                                                                                                            
-   buffer: ArrayBuffer;                                                                                                                                                                       
-   quality: number;                                                                                                                                                                           
- };                                                                                                                                                                                           
-                                                                                                                                                                                              
- type ReleaseRequest = {                                                                                                                                                                      
-   type: 'release';                                                                                                                                                                           
-   itemId: string;                                                                                                                                                                            
- };                                                                                                                                                                                           
-                                                                                                                                                                                              
- type ClearRequest = {                                                                                                                                                                        
-   type: 'clear';                                                                                                                                                                             
- };                                                                                                                                                                                           
-                                                                                                                                                                                              
- type WorkerRequest = CompressRequest | ReleaseRequest | ClearRequest;                                                                                                                        
-                                                                                                                                                                                              
- type WorkerResponse = {                                                                                                                                                                      
-   type: 'compressed';                                                                                                                                                                        
-   requestId: number;                                                                                                                                                                         
-   itemId: string;                                                                                                                                                                            
-   buffer: ArrayBuffer;                                                                                                                                                                       
- } | {                                                                                                                                                                                        
-   type: 'error';                                                                                                                                                                             
-   requestId: number;                                                                                                                                                                         
-   itemId: string;                                                                                                                                                                            
-   message: string;                                                                                                                                                                           
- };                                                                                                                                                                                           
-                                                                                                                                                                                              
- type DecodedPng = {                                                                                                                                                                          
-   data: Uint8ClampedArray;                                                                                                                                                                   
-   width: number;                                                                                                                                                                             
-   height: number;                                                                                                                                                                            
- };                                                                                                                                                                                           
-                                                                                                                                                                                              
- type CachedPng = {                                                                                                                                                                           
-   decoded?: DecodedPng;                                                                                                                                                                      
-   lossless?: ArrayBuffer;                                                                                                                                                                    
- };                                                                                                                                                                                           
-                                                                                                                                                                                              
- const imageCache = new Map<string, CachedPng>();                                                                                                                                             
- const workerScope: Worker = self as unknown as Worker;                                                                                                                                       
- let imageQuantReady: Promise<unknown> | undefined;                                                                                                                                           
-                                                                                                                                                                                              
- function initQuantizer(): Promise<unknown> {                                                                                                                                                 
-   imageQuantReady ??= initImageQuant(imageQuantWasmUrl);                                                                                                                                     
-   return imageQuantReady;                                                                                                                                                                    
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- function clamp(value: number, min: number, max: number): number {                                                                                                                            
-   return Math.min(max, Math.max(min, value));                                                                                                                                                
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- function exactArrayBuffer(bytes: Uint8Array | Uint8ClampedArray | ArrayBuffer): ArrayBuffer {                                                                                                
-   if (bytes instanceof ArrayBuffer) return bytes.slice(0);                                                                                                                                   
-   const copy = new Uint8Array(bytes.byteLength);                                                                                                                                        
-   copy.set(new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength));                                                                                                           
-   return copy.buffer;                                                                                                        
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- function byteLength(buffer: ArrayBuffer): number {                                                                                                                                           
-   return buffer.byteLength;                                                                                                                                                                  
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- async function optimisePng(buffer: ArrayBuffer): Promise<ArrayBuffer> {                                                                                                                      
-   try {                                                                                                                                                                                      
-     return await optimise(buffer, {                                                                                                                                                          
-       level: 6,                                                                                                                                                                              
-       interlace: false,                                                                                                                                                                      
-       optimiseAlpha: true,                                                                                                                                                                   
-     });                                                                                                                                                                                      
-   } catch {                                                                                                                                                                                  
-     return buffer;                                                                                                                                                                           
-   }                                                                                                                                                                                          
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- function getQuantizationOptions(quality: number): {                                                                                                                                          
-   minQuality: number;                                                                                                                                                                        
-   targetQuality: number;                                                                                                                                                                     
-   maxColors: number;                                                                                                                                                                         
-   speed: number;                                                                                                                                                                             
-   dithering: number;                                                                                                                                                                         
- } {                                                                                                                                                                                          
-   const targetQuality = clamp(Math.round(quality), 10, 100);                                                                                                                                 
-   const minQuality = clamp(targetQuality - (targetQuality >= 90 ? 6 : 12), 0, 100);                                                                                                          
-                                                                                                                                                                                              
-   // Keep high-quality files near full palette, but reduce colors harder as the                                                                                                              
-   // slider moves down. libimagequant can still use fewer colors when possible.                                                                                                              
-   const normalized = targetQuality / 100;                                                                                                                                                    
-   const maxColors = clamp(Math.round(2 + 254 * normalized * normalized), 2, 256);                                                                                                            
-                                                                                                                                                                                              
-   return {                                                                                                                                                                                   
-     minQuality,                                                                                                                                                                              
-     targetQuality,                                                                                                                                                                           
-     maxColors,                                                                                                                                                                               
-     // libimagequant speed: 1 = best quality/slowest, 10 = fastest.                                                                                                                          
-     // Stay close to best quality while avoiding terrible latency on lower settings.                                                                                                         
-     speed: targetQuality >= 85 ? 1 : targetQuality >= 70 ? 2 : targetQuality >= 50 ? 3 : 4,                                                                                                  
-     dithering: targetQuality >= 85 ? 0.9 : targetQuality >= 65 ? 0.75 : targetQuality >= 45 ? 0.55 : 0.35,                                                                                   
-   };                                                                                                                                                                                         
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- async function decodePng(buffer: ArrayBuffer): Promise<DecodedPng> {                                                                                                                         
-   await initQuantizer();                                                                                                                                                                     
-   const decoded = decode_png_to_rgba(new Uint8Array(buffer));                                                                                                                                
-   const data = decoded[0] as Uint8ClampedArray;                                                                                                                                              
-   const width = decoded[1] as number;                                                                                                                                                        
-   const height = decoded[2] as number;                                                                                                                                                       
-   return { data, width, height };                                                                                                                                                            
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- async function quantizePng(decoded: DecodedPng, quality: number): Promise<ArrayBuffer> {                                                                                                     
-   await initQuantizer();                                                                                                                                                                     
-   const options = getQuantizationOptions(quality);                                                                                                                                           
-   const quantizer = new ImageQuantizer();                                                                                                                                                    
-                                                                                                                                                                                              
-   try {                                                                                                                                                                                      
-     quantizer.setSpeed(options.speed);                                                                                                                                                       
-     quantizer.setQuality(options.minQuality, options.targetQuality);                                                                                                                         
-     quantizer.setMaxColors(options.maxColors);                                                                                                                                               
-                                                                                                                                                                                              
-     const result = quantizer.quantizeImage(decoded.data, decoded.width, decoded.height);                                                                                                     
-     try {                                                                                                                                                                                    
-       result.setDithering(options.dithering);                                                                                                                                                
-       const palette = result.getPalette();                                                                                                                                                   
-       const paletteIndices = result.getPaletteIndices(decoded.data, decoded.width, decoded.height);                                                                                          
-       const pngBytes = encode_palette_to_png(paletteIndices, palette, decoded.width, decoded.height);                                                                                        
-       return exactArrayBuffer(pngBytes);                                                                                                                                                     
-     } finally {                                                                                                                                                                              
-       result.free();                                                                                                                                                                         
-     }                                                                                                                                                                                        
-   } finally {                                                                                                                                                                                
-     quantizer.free();                                                                                                                                                                        
-   }                                                                                                                                                                                          
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- async function getLosslessOptimized(itemId: string, buffer: ArrayBuffer): Promise<ArrayBuffer> {                                                                                             
-   const cache = imageCache.get(itemId) ?? {};                                                                                                                                                
-   if (!cache.lossless) {                                                                                                                                                                     
-     cache.lossless = await optimisePng(buffer);                                                                                                                                              
-     imageCache.set(itemId, cache);                                                                                                                                                           
-   }                                                                                                                                                                                          
-   return cache.lossless;                                                                                                                                                                     
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- async function getDecoded(itemId: string, buffer: ArrayBuffer): Promise<DecodedPng> {                                                                                                        
-   const cache = imageCache.get(itemId) ?? {};                                                                                                                                                
-   if (!cache.decoded) {                                                                                                                                                                      
-     cache.decoded = await decodePng(buffer);                                                                                                                                                 
-     imageCache.set(itemId, cache);                                                                                                                                                           
-   }                                                                                                                                                                                          
-   return cache.decoded;                                                                                                                                                                      
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- async function compress({ requestId, itemId, buffer, quality }: CompressRequest): Promise<void> {                                                                                            
-   try {                                                                                                                                                                                      
-     const lossless = await getLosslessOptimized(itemId, buffer);                                                                                                                             
-     let best = lossless;                                                                                                                                                                     
-                                                                                                                                                                                              
-     // Quality 100 means truly lossless PNG optimization. Lower settings use                                                                                                                 
-     // libimagequant first, then oxipng squeezes the indexed PNG further.                                                                                                                    
-     if (quality < 100) {                                                                                                                                                                     
-       const decoded = await getDecoded(itemId, buffer);                                                                                                                                      
-       const quantized = await quantizePng(decoded, quality);                                                                                                                                 
-       const quantizedOptimized = await optimisePng(quantized);                                                                                                                               
-       if (byteLength(quantizedOptimized) < byteLength(best)) best = quantizedOptimized;                                                                                                      
-     }                                                                                                                                                                                        
-                                                                                                                                                                                              
-     const output = exactArrayBuffer(best);                                                                                                                                                   
-     const response: WorkerResponse = {                                                                                                                                                       
-       type: 'compressed',                                                                                                                                                                    
-       requestId,                                                                                                                                                                             
-       itemId,                                                                                                                                                                                
-       buffer: output,                                                                                                                                                                        
-     };                                                                                                                                                                                       
-     workerScope.postMessage(response, [output]);                                                                                                                                             
-   } catch (error) {                                                                                                                                                                          
-     const response: WorkerResponse = {                                                                                                                                                       
-       type: 'error',                                                                                                                                                                         
-       requestId,                                                                                                                                                                             
-       itemId,                                                                                                                                                                                
-       message: error instanceof Error ? error.message : 'Could not compress this PNG file.',                                                                                                 
-     };                                                                                                                                                                                       
-     workerScope.postMessage(response);                                                                                                                                                       
-   }                                                                                                                                                                                          
- }                                                                                                                                                                                            
-                                                                                                                                                                                              
- workerScope.addEventListener('message', (event: MessageEvent<WorkerRequest>) => {                                                                                                            
-   const message = event.data;                                                                                                                                                                
-                                                                                                                                                                                              
-   if (message.type === 'compress') {                                                                                                                                                         
-     void compress(message);                                                                                                                                                                  
-   } else if (message.type === 'release') {                                                                                                                                                   
-     imageCache.delete(message.itemId);                                                                                                                                                       
-   } else {                                                                                                                                                                                   
-     imageCache.clear();                                                                                                                                                                      
-   }                                                                                                                                                                                          
- });
+// 1. Import the WASM initializer and bindings from your local vendor folder
+import init, { Imagequant, ImagequantImage } from './vendor/imagequant';
+
+// 2. Import the raw .wasm binary file path natively using Vite's URL suffix
+import wasmUrl from './vendor/imagequant/imagequant_bg.wasm?url';
+
+// Keep track of the initialization state so we only boot the WASM instance once
+let wasmReadyPromise: Promise<any> | null = null;
+
+function ensureWasmInitialized(): Promise<any> {
+  if (!wasmReadyPromise) {
+    // Vite resolves 'wasmUrl' to a standard asset path string, which we feed to init()
+    wasmReadyPromise = init(wasmUrl);
+  }
+  return wasmReadyPromise;
+}
+
+// Communication interfaces matching your image-compressor.ts setup
+type WorkerRequest = 
+  | { type: 'compress'; requestId: number; itemId: string; buffer: ArrayBuffer; quality: number; }
+  | { type: 'release'; itemId: string; }
+  | { type: 'clear'; };
+
+type WorkerResponse = 
+  | { type: 'compressed'; requestId: number; itemId: string; buffer: ArrayBuffer; }
+  | { type: 'error'; requestId: number; itemId: string; message: string; };
+
+const ctx: Worker = self as any;
+
+ctx.addEventListener('message', async (event: MessageEvent<WorkerRequest>) => {
+  const message = event.data;
+
+  if (message.type === 'compress') {
+    const { requestId, itemId, buffer, quality } = message;
+
+    try {
+      // Step A: Make sure the WebAssembly binary is compiled and ready
+      await ensureWasmInitialized();
+
+      // Step B: Decode the incoming file ArrayBuffer into raw image pixels
+      const blob = new Blob([buffer]);
+      const bitmap = await createImageBitmap(blob);
+      const { width, height } = bitmap;
+
+      // Extract pixel data using an OffscreenCanvas
+      const canvas = new OffscreenCanvas(width, height);
+      const context = canvas.getContext('2d');
+      if (!context) {
+        throw new Error('Failed to acquire 2D context from OffscreenCanvas.');
+      }
+      
+      context.drawImage(bitmap, 0, 0, width, height);
+      const imageData = context.getImageData(0, 0, width, height);
+      
+      // Free the ImageBitmap memory immediately
+      bitmap.close();
+
+      // Step C: Initialize Imagequant structures
+      const pixels = new Uint8Array(imageData.data.buffer);
+      const imagequantImage = new ImagequantImage(pixels, width, height, 0);
+      const quantizer = new Imagequant();
+
+      // Map your UI slider quality (10 - 100) to Imagequant's internal bounds
+      quantizer.set_quality(0, quality);
+
+      // Step D: Run the quantization logic 
+      const outputPngBytes = quantizer.process(imagequantImage);
+
+      // Step E: Safely extract and slice the underlying buffer 
+      // We explicitly cast the sliced result to ArrayBuffer to satisfy the strict TS compiler
+      const outputBuffer = outputPngBytes.buffer.slice(
+        outputPngBytes.byteOffset,
+        outputPngBytes.byteOffset + outputPngBytes.byteLength
+      ) as ArrayBuffer;
+
+      // Step F: Respond back to the main UI orchestrator with zero-copy memory allocation transfers
+      const response: WorkerResponse = {
+        type: 'compressed',
+        requestId,
+        itemId,
+        buffer: outputBuffer
+      };
+      
+      ctx.postMessage(response, [outputBuffer]);
+
+    } catch (error: any) {
+      // Send any execution failures back up to your UI layer
+      const errorResponse: WorkerResponse = {
+        type: 'error',
+        requestId,
+        itemId,
+        message: error?.message || 'An error occurred during PNG compression.'
+      };
+      
+      ctx.postMessage(errorResponse);
+    }
+  }
+
+  if (message.type === 'release' || message.type === 'clear') {
+    // Memory sweeps clean automatically via V8 garbage collection once variables drop out of scope
+  }
+});

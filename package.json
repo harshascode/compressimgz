@@ -14,8 +14,6 @@
   },
   "dependencies": {
     "@jsquash/jpeg": "^1.6.0",
-    "@jsquash/oxipng": "^2.3.0",
-    "imagequant": "^0.1.2",
-    "libimagequant-wasm": "^0.3.0"
+    "@jsquash/oxipng": "^2.3.0"
   }
 }
