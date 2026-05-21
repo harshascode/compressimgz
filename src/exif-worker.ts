@@ -1,65 +1,111 @@
-import { parseMetadata, writeMetadata } from '@uswriting/exiftool';
+// exif-worker.ts
 
-type WorkerRequest = 
-  | { type: 'parse'; requestId: number; itemId: string; file: File }
-  | { type: 'strip'; requestId: number; itemId: string; file: File };
+let exiftoolPromise: Promise<any> | null = null;
 
-type WorkerResponse = 
-  | { type: 'parsed'; requestId: number; itemId: string; metadata: Record<string, string> }
-  | { type: 'stripped'; requestId: number; itemId: string; buffer: ArrayBuffer }
-  | { type: 'error'; requestId: number; itemId: string; message: string };
+// Dynamically load the ExifTool WASM wrapper
+// Dynamically load the ExifTool WASM wrapper
+async function loadExiftool() {
+  if (exiftoolPromise) return exiftoolPromise;
 
-const workerScope = self as unknown as Worker;
+  exiftoolPromise = (async () => {
+    
+    // By creating a full "http://localhost:5173/js/exiftool.js" URL, 
+    // Vite treats it as an external network request and stops interfering.
+    const scriptUrl = new URL('/js/exiftool.js', self.location.origin).href;
+    
+    // @ts-ignore - TypeScript cannot resolve network URLs at compile time
+    const module = await import(/* @vite-ignore */ scriptUrl) as any;
+    
+    // Warm up the WASM instance
+    try {
+      const dummyFile = { name: 'warmup.txt', data: new Uint8Array([]) };
+      await module.parseMetadata(dummyFile, { args: ['-ver'] });
+    } catch (e) {
+      // Ignore warmup errors
+    }
 
-workerScope.addEventListener('message', async (event: MessageEvent<WorkerRequest>) => {
-  const req = event.data;
+    return module;
+  })();
+
+  return exiftoolPromise;
+}
+
+// Helper: Converts ExifTool's textual output into a key-value object
+function parseExifToolText(text: string): Record<string, string> {
+  const metadata: Record<string, string> = {};
+  if (!text) return metadata;
+
+  const lines = text.split('\n');
+  const excludeGroups = ['Composite', 'ExifTool', 'System', 'File'];
+
+  for (const line of lines) {
+    const groupMatch = line.match(/^\[([^\]]+)\]\s+/);
+    if (!groupMatch) continue;
+
+    const group = groupMatch[1];
+    if (excludeGroups.includes(group)) continue;
+
+    const rest = line.substring(groupMatch[0].length);
+    const colonIndex = rest.indexOf(':');
+    if (colonIndex === -1) continue;
+
+    const key = rest.substring(0, colonIndex).trim();
+    const value = rest.substring(colonIndex + 1).trim();
+
+    if (key && value && !value.startsWith('(Binary data')) {
+      metadata[key] = value;
+    }
+  }
+
+  return metadata;
+}
+
+self.onmessage = async (e: MessageEvent) => {
+  const { type, requestId, itemId, file } = e.data;
   
+  // FIX 2: Cast self to 'any' so TS stops treating it like a Window object
+  const ctx = self as any;
+
   try {
-    if (req.type === 'parse') {
-      const result = await parseMetadata(req.file, {
-        args: ['-json']
-      });
-      
-      // Explicitly check for failure to force type narrowing
-      if (result.success === false) {
-        throw new Error(result.error || 'Failed to parse metadata');
+    const { parseMetadata, writeMetadata } = await loadExiftool();
+    
+    const arrayBuffer = await file.arrayBuffer();
+    const virtualFile = { name: file.name, data: new Uint8Array(arrayBuffer) };
+
+    if (type === 'parse') {
+      const result = await parseMetadata(virtualFile, { args: ['-G'] });
+
+      if (result.success && result.data) {
+        const metadata = parseExifToolText(result.data);
+        ctx.postMessage({ requestId, itemId, metadata });
+      } else {
+        throw new Error(result.error || 'Failed to read metadata');
       }
-      
-      const parsedData = JSON.parse(result.data as unknown as string);
-      const metadataObj = Array.isArray(parsedData) ? parsedData[0] : parsedData;
-      
-      const response: WorkerResponse = {
-        type: 'parsed',
-        requestId: req.requestId,
-        itemId: req.itemId,
-        metadata: metadataObj as Record<string, string>
-      };
-      workerScope.postMessage(response);
-      
-    } else if (req.type === 'strip') {
-      const result = await writeMetadata(req.file, {}, { args: ['-all='] });
-      
-      // Explicitly check for failure to force type narrowing
-      if (result.success === false) {
+    } 
+    
+    else if (type === 'strip') {
+      const result = await writeMetadata(virtualFile, {}, {
+        args: ['-all=', '--icc_profile:all']
+      });
+
+      // The original code uses a fallback: result.data || virtualFile.data
+      if (result.success) {
+        const buffer = result.data || virtualFile.data;
+        
+        // Just send the buffer directly without the transfer array
+        ctx.postMessage({ requestId, itemId, buffer }); 
+      } else {
         throw new Error(result.error || 'Failed to strip metadata');
       }
-      
-      const response: WorkerResponse = {
-        type: 'stripped',
-        requestId: req.requestId,
-        itemId: req.itemId,
-        buffer: result.data
-      };
-      
-      workerScope.postMessage(response, [result.data]);
     }
-  } catch (error) {
-    const response: WorkerResponse = {
-      type: 'error',
-      requestId: req.requestId,
-      itemId: req.itemId,
-      message: error instanceof Error ? error.message : 'An error occurred processing the file.'
-    };
-    workerScope.postMessage(response);
+
+  } catch (error: any) {
+    console.error(`Worker Error [${type}]:`, error);
+    ctx.postMessage({ 
+      type: 'error', 
+      requestId, 
+      itemId, 
+      message: error.message || 'Worker crashed' 
+    });
   }
-});
+};

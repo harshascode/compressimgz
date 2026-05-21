@@ -94,29 +94,45 @@ function updateButtons() {
 function updateCardUI(item: FileItem) {
   const { card, status, metadata } = item;
 
-  card.querySelectorAll('.ui-file-state').forEach(el => el.classList.remove('ui-file-state-visible', 'file-state-visible'));
+  // Clear all visible states first
+  card.querySelectorAll('.ui-file-state').forEach(el => 
+    el.classList.remove('ui-file-state-visible')
+  );
+  
   const btn = card.querySelector('.ui-file-download') as HTMLButtonElement;
   btn.style.display = 'none';
 
   if (status === 'pending' || status === 'reading') {
-    card.querySelector('.file-state-reading')?.classList.add('ui-file-state-visible', 'file-state-visible');
+    // Note: The HTML template uses ui-file-state-pending for the reading icon
+    card.querySelector('.ui-file-state-pending')?.classList.add('ui-file-state-visible');
+    const readEl = card.querySelector('.ui-file-state-pending .ui-file-state-text');
+    if (readEl) readEl.textContent = 'READING...';
+    
   } else if (status === 'ready') {
-    const readyState = card.querySelector('.file-state-ready');
-    readyState?.classList.add('ui-file-state-visible', 'file-state-visible');
-    const keys = Object.keys(metadata || {});
-    readyState!.querySelector('.ui-file-state-text-tags')!.textContent = keys.length > 0 ? `${keys.length} TAGS` : 'NO EXIF';
+    const readyState = card.querySelector('.ui-file-state-ready');
+    if (readyState) {
+      readyState.classList.add('ui-file-state-visible');
+      const keys = Object.keys(metadata || {});
+      const textEl = readyState.querySelector('.ui-file-state-text-tags');
+      if (textEl) textEl.textContent = keys.length > 0 ? `${keys.length} TAGS` : 'NO EXIF';
+    }
+    
   } else if (status === 'processing') {
-    card.querySelector('.ui-file-state-pending')?.classList.add('ui-file-state-visible', 'file-state-visible'); // fallback, template missing processing state for EXIF? No, we use reading icon maybe
-    card.querySelector('.file-state-reading')?.classList.add('ui-file-state-visible', 'file-state-visible');
-    const readEl = card.querySelector('.file-state-reading .ui-file-state-text');
+    card.querySelector('.ui-file-state-pending')?.classList.add('ui-file-state-visible');
+    const readEl = card.querySelector('.ui-file-state-pending .ui-file-state-text');
     if (readEl) readEl.textContent = 'STRIPPING...';
+    
   } else if (status === 'done') {
-    const readyState = card.querySelector('.file-state-ready');
-    readyState?.classList.add('ui-file-state-visible', 'file-state-visible');
-    readyState!.querySelector('.ui-file-state-text-tags')!.textContent = 'CLEAN';
+    const readyState = card.querySelector('.ui-file-state-ready');
+    if (readyState) {
+      readyState.classList.add('ui-file-state-visible');
+      const textEl = readyState.querySelector('.ui-file-state-text-tags');
+      if (textEl) textEl.textContent = 'CLEAN';
+    }
     btn.style.display = 'block';
+    
   } else if (status === 'error') {
-    card.querySelector('.ui-file-state-error')?.classList.add('ui-file-state-visible', 'file-state-visible');
+    card.querySelector('.ui-file-state-error')?.classList.add('ui-file-state-visible');
   }
 }
 
