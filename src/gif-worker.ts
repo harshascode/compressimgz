@@ -3,6 +3,7 @@ if (typeof (self as any).Element === 'undefined') {
   (self as any).Element = class {};
 }
 
+// @ts-ignore
 import gifsicle from 'gifsicle-wasm-browser';
 
 type CompressRequest = {

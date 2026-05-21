@@ -1,33 +1,13 @@
 import { parseMetadata, writeMetadata } from '@uswriting/exiftool';
 
-type WorkerRequest = {
-  type: 'parse';
-  requestId: number;
-  itemId: string;
-  file: File;
-} | {
-  type: 'strip';
-  requestId: number;
-  itemId: string;
-  file: File;
-};
+type WorkerRequest = 
+  | { type: 'parse'; requestId: number; itemId: string; file: File }
+  | { type: 'strip'; requestId: number; itemId: string; file: File };
 
-type WorkerResponse = {
-  type: 'parsed';
-  requestId: number;
-  itemId: string;
-  metadata: Record<string, string>;
-} | {
-  type: 'stripped';
-  requestId: number;
-  itemId: string;
-  buffer: ArrayBuffer;
-} | {
-  type: 'error';
-  requestId: number;
-  itemId: string;
-  message: string;
-};
+type WorkerResponse = 
+  | { type: 'parsed'; requestId: number; itemId: string; metadata: Record<string, string> }
+  | { type: 'stripped'; requestId: number; itemId: string; buffer: ArrayBuffer }
+  | { type: 'error'; requestId: number; itemId: string; message: string };
 
 const workerScope = self as unknown as Worker;
 
@@ -39,8 +19,10 @@ workerScope.addEventListener('message', async (event: MessageEvent<WorkerRequest
       const result = await parseMetadata(req.file, {
         args: ['-json']
       });
-      if (!result.success) {
-        throw new Error(result.error);
+      
+      // Explicitly check for failure to force type narrowing
+      if (result.success === false) {
+        throw new Error(result.error || 'Failed to parse metadata');
       }
       
       const parsedData = JSON.parse(result.data as unknown as string);
@@ -56,8 +38,10 @@ workerScope.addEventListener('message', async (event: MessageEvent<WorkerRequest
       
     } else if (req.type === 'strip') {
       const result = await writeMetadata(req.file, {}, { args: ['-all='] });
-      if (!result.success) {
-        throw new Error(result.error);
+      
+      // Explicitly check for failure to force type narrowing
+      if (result.success === false) {
+        throw new Error(result.error || 'Failed to strip metadata');
       }
       
       const response: WorkerResponse = {
@@ -66,6 +50,7 @@ workerScope.addEventListener('message', async (event: MessageEvent<WorkerRequest
         itemId: req.itemId,
         buffer: result.data
       };
+      
       workerScope.postMessage(response, [result.data]);
     }
   } catch (error) {
