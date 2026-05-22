@@ -1,6 +1,3 @@
-// SHHH look away BunnyCDN is being weird so I'm using this old one
-// const BASE_URL = 'https://sam2-model-download.b-cdn.net';
-// const zeroPerlUrl = `${BASE_URL}/zeroperl.wasm`;
 const zeroPerlUrl = `/wasm/zeroperl.wasm`;
 
 async function fetchZeroPerl(): Promise<ArrayBuffer> {
