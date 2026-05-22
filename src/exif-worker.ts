@@ -1,5 +1,7 @@
 // exif-worker.ts
 
+import './wasm-decompressor';
+
 let exiftoolPromise: Promise<any> | null = null;
 
 // Dynamically load the ExifTool WASM wrapper
