@@ -76,7 +76,7 @@ async function stripExifWithWorker(itemId: string, file: File): Promise<ArrayBuf
   return new Promise((resolve, reject) => {
     const requestId = nextWorkerRequestId++;
     workerRequests.set(requestId, { resolve: (msg) => resolve(msg.buffer), reject });
-    worker.postMessage({ type: 'strip', requestId, itemId, file });
+    worker.postMessage({ type: 'remove', requestId, itemId, file });
   });
 }
 

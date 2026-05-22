@@ -1,4 +1,4 @@
-import { runExifTools } from './exif/run-exif-tools';
+import { runExifTools, removeExifTools } from './exif/run-exif-tools';
 
 type ParseExifRequest = {
 	type: 'parse';
@@ -68,13 +68,23 @@ workerScope.addEventListener('message', async (event: MessageEvent<WorkerRequest
 			workerScope.postMessage(errorResponse);
 		}
 	} else if (req.type === 'remove') {
-        // For now, implement just throwing error as we don't have remove function yet
-        const errorResponse: WorkerErrorResponse = {
-            type: 'error',
-            requestId: req.requestId,
-            itemId: req.itemId,
-            message: 'Remove EXIF is not yet implemented in the worker',
-        };
-        workerScope.postMessage(errorResponse);
+        try {
+            const buffer = await removeExifTools(req.file);
+            const response: RemoveExifResponse = {
+                type: 'removed',
+                requestId: req.requestId,
+                itemId: req.itemId,
+                buffer,
+            };
+            workerScope.postMessage(response);
+        } catch (error) {
+            const errorResponse: WorkerErrorResponse = {
+                type: 'error',
+                requestId: req.requestId,
+                itemId: req.itemId,
+                message: error instanceof Error ? error.message : 'Failed to remove EXIF data',
+            };
+            workerScope.postMessage(errorResponse);
+        }
     }
 });
