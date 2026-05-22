@@ -13,10 +13,10 @@
     "vite": "^8.0.12"
   },
   "dependencies": {
+    "@bjorn3/browser_wasi_shim": "^0.4.2",
     "@jsquash/avif": "^2.1.1",
     "@jsquash/jpeg": "^1.6.0",
     "@jsquash/webp": "^1.5.0",
-    "@uswriting/exiftool": "^1.0.9",
     "fflate": "^0.8.3",
     "gifsicle-wasm-browser": "^1.5.19"
   }

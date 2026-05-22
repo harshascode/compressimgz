@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@bjorn3/browser_wasi_shim':
+        specifier: ^0.4.2
+        version: 0.4.2
       '@jsquash/avif':
         specifier: ^2.1.1
         version: 2.1.1
@@ -17,9 +20,6 @@ importers:
       '@jsquash/webp':
         specifier: ^1.5.0
         version: 1.5.0
-      '@uswriting/exiftool':
-        specifier: ^1.0.9
-        version: 1.0.9
       fflate:
         specifier: ^0.8.3
         version: 0.8.3
@@ -36,8 +36,8 @@ importers:
 
 packages:
 
-  '@6over3/zeroperl-ts@1.0.10':
-    resolution: {integrity: sha512-d7fBgN1UaP9BR6kZMyNsjIrxPd0QLqqx29VSprhK66m1csm/7E/anr+rEfp3gJDSne5FfDpM6aKtDGHyXG/vYQ==}
+  '@bjorn3/browser_wasi_shim@0.4.2':
+    resolution: {integrity: sha512-/iHkCVUG3VbcbmEHn5iIUpIrh7a7WPiwZ3sHy4HZKZzBdSadwdddYDZAII2zBvQYV0Lfi8naZngPCN7WPHI/hA==}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -160,9 +160,6 @@ packages:
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
-
-  '@uswriting/exiftool@1.0.9':
-    resolution: {integrity: sha512-tziE5oH/Wf4gJ/g/ZVGBxCjnoHz27SxXRZ4KoFa4c0qN/6uBfvBFEQ272dq7LxbzhXkvGqHdmDyNJe/WUZCV5A==}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -343,7 +340,7 @@ packages:
 
 snapshots:
 
-  '@6over3/zeroperl-ts@1.0.10': {}
+  '@bjorn3/browser_wasi_shim@0.4.2': {}
 
   '@emnapi/core@1.10.0':
     dependencies:
@@ -435,10 +432,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@uswriting/exiftool@1.0.9':
-    dependencies:
-      '@6over3/zeroperl-ts': 1.0.10
 
   detect-libc@2.1.2: {}
 
