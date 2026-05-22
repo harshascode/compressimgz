@@ -39,7 +39,6 @@ const State = {
 };
 
 function isPromise(
-	// @ts-expect-error using an any
 	obj: any
 ) {
 	return (
@@ -210,7 +209,6 @@ export class Instance extends WebAssembly.Instance {
 	}
 
 	get exports() {
-		// @ts-expect-error
 		return WRAPPED_EXPORTS.get(super.exports);
 	}
 }
@@ -218,11 +216,19 @@ export class Instance extends WebAssembly.Instance {
 Object.defineProperty(Instance.prototype, 'exports', { enumerable: true });
 
 export async function instantiate(
+	source: BufferSource,
+	imports?: ImportObject
+): Promise<WebAssembly.WebAssemblyInstantiatedSource>;
+export async function instantiate(
+	source: WebAssembly.Module,
+	imports?: ImportObject
+): Promise<WebAssembly.Instance>;
+export async function instantiate(
 	source: WebAssembly.Module | BufferSource,
 	imports?: ImportObject
 ): Promise<WebAssembly.WebAssemblyInstantiatedSource | WebAssembly.Instance> {
 	const state = new Asyncify();
-	const result = await WebAssembly.instantiate(source, state.wrapImports(imports));
+	const result = await WebAssembly.instantiate(source as any, state.wrapImports(imports)) as WebAssembly.WebAssemblyInstantiatedSource | WebAssembly.Instance;
 	state.init(result instanceof WebAssembly.Instance ? result : result.instance, imports);
 	return result;
 }
