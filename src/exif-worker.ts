@@ -3,7 +3,6 @@
 let exiftoolPromise: Promise<any> | null = null;
 
 // Dynamically load the ExifTool WASM wrapper
-// Dynamically load the ExifTool WASM wrapper
 async function loadExiftool() {
   if (exiftoolPromise) return exiftoolPromise;
 
