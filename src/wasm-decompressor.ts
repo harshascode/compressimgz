@@ -8,54 +8,117 @@ import { gunzipSync } from 'fflate';
  * and Fetch interception.
  */
 
-const WASM_URL = '/wasm/zeroperl.wasm';
-const GZ_URL = '/wasm/zeroperl.wasm.gz';
+const WASM_PATH = '/wasm/zeroperl.wasm';
+const GZ_PATH = '/wasm/zeroperl.wasm.gz';
 const CACHE_NAME = 'wasm-cache-v1';
 
-// Intercept fetch synchronously to ensure we catch all requests
 const originalFetch = self.fetch;
-
 let decompressionPromise: Promise<Response> | null = null;
 
 async function getDecompressedResponse(): Promise<Response> {
-  const cache = await caches.open(CACHE_NAME);
+  console.log('[WASM-Decompressor] Starting decompression process...');
   
-  // 1. Check if we already have it in cache
-  const cached = await cache.match(WASM_URL);
-  if (cached) return cached;
+  let cache: Cache | null = null;
+  if ('caches' in self) {
+    try {
+      cache = await caches.open(CACHE_NAME);
+      const cached = await cache.match(WASM_PATH);
+      if (cached) {
+        console.log('[WASM-Decompressor] Found in cache.');
+        return cached;
+      }
+    } catch (e) {
+      console.warn('[WASM-Decompressor] Cache API error:', e);
+    }
+  }
 
-  // 2. If not, fetch the compressed version
-  console.log('[WASM-Decompressor] Fetching compressed WASM...');
-  const response = await originalFetch(GZ_URL);
-  if (!response.ok) throw new Error(`Failed to fetch ${GZ_URL}`);
+  const gzUrl = new URL(GZ_PATH, self.location.origin).href;
+  console.log(`[WASM-Decompressor] Fetching: ${gzUrl}`);
+  
+  // Use originalFetch to avoid interception recursion
+  const response = await originalFetch(gzUrl);
+  if (!response.ok) {
+     throw new Error(`Failed to fetch ${gzUrl}: ${response.status} ${response.statusText}`);
+  }
 
-  // 3. Decompress
-  console.log('[WASM-Decompressor] Decompressing...');
   const buffer = await response.arrayBuffer();
-  const decompressed = gunzipSync(new Uint8Array(buffer));
+  const uint8 = new Uint8Array(buffer);
   
-  const wasmResponse = new Response(decompressed, {
-    headers: { 'Content-Type': 'application/wasm' }
-  });
+  console.log(`[WASM-Decompressor] Received ${uint8.length} bytes.`);
+  console.log(`[WASM-Decompressor] Header bytes: ${uint8[0].toString(16)}, ${uint8[1].toString(16)}, ${uint8[2].toString(16)}, ${uint8[3].toString(16)}`);
 
-  // 4. "Save" it in the browser's virtual folder (Cache API)
-  await cache.put(WASM_URL, wasmResponse.clone());
-  console.log('[WASM-Decompressor] WASM ready and cached.');
+  // Check for GZIP signature: 1f 8b
+  if (uint8[0] === 0x1f && uint8[1] === 0x8b) {
+    console.log('[WASM-Decompressor] Valid GZIP signature found. Decompressing...');
+    try {
+      const decompressed = gunzipSync(uint8);
+      console.log(`[WASM-Decompressor] Decompressed successfully to ${decompressed.length} bytes.`);
+      
+      const wasmResponse = new Response(decompressed, {
+        headers: { 'Content-Type': 'application/wasm' }
+      });
+
+      if (cache) {
+        try {
+          await cache.put(WASM_PATH, wasmResponse.clone());
+          console.log('[WASM-Decompressor] Saved to cache.');
+        } catch (e) {
+          console.warn('[WASM-Decompressor] Failed to save to cache:', e);
+        }
+      }
+      
+      return wasmResponse;
+    } catch (err) {
+      console.error('[WASM-Decompressor] gunzipSync failed. Data might be corrupted or in an unsupported gzip format.', err);
+      throw err;
+    }
+  } 
   
-  return wasmResponse;
+  // If it's already WASM (starts with \0asm)
+  if (uint8[0] === 0x00 && uint8[1] === 0x61 && uint8[2] === 0x73 && uint8[3] === 0x6d) {
+    console.log('[WASM-Decompressor] Data is already WASM. Using as-is.');
+    const wasmResponse = new Response(uint8, {
+      headers: { 'Content-Type': 'application/wasm' }
+    });
+    if (cache) await cache.put(WASM_PATH, wasmResponse.clone());
+    return wasmResponse;
+  }
+
+  const firstBytes = Array.from(uint8.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join(' ');
+  throw new Error(`Invalid data format. Expected GZIP (1f 8b) or WASM (00 61 73 6d). Received header: ${firstBytes}`);
 }
 
 // Override fetch globally in this worker
 self.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-  const url = typeof input === 'string' ? input : (input as Request | URL).toString();
-  
-  // Check if the request is for our target WASM file
-  if (url.includes(WASM_URL) && !url.endsWith('.gz')) {
-    if (!decompressionPromise) {
-      decompressionPromise = getDecompressedResponse();
+  let urlStr: string;
+  if (typeof input === 'string') {
+    urlStr = input;
+  } else if (input instanceof URL) {
+    urlStr = input.href;
+  } else {
+    // Request object
+    urlStr = (input as Request).url;
+  }
+
+  try {
+    const url = new URL(urlStr, self.location.origin);
+    // Be very specific about matching the target path
+    if (url.pathname === WASM_PATH) {
+      if (!decompressionPromise) {
+        decompressionPromise = getDecompressedResponse();
+      }
+      const response = await decompressionPromise;
+      return response.clone();
     }
-    const response = await decompressionPromise;
-    return response.clone();
+  } catch (e) {
+    // Fallback for relative paths or invalid URLs
+    if (typeof urlStr === 'string' && urlStr.includes(WASM_PATH) && !urlStr.endsWith('.gz')) {
+      if (!decompressionPromise) {
+        decompressionPromise = getDecompressedResponse();
+      }
+      const response = await decompressionPromise;
+      return response.clone();
+    }
   }
   
   return originalFetch(input, init);
