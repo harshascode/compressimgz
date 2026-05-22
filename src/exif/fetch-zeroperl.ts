@@ -13,11 +13,16 @@ async function fetchZeroPerl(): Promise<ArrayBuffer> {
 		const buffer = await file.arrayBuffer();
 
 		// Validate the buffer has content (magic number for WASM is \0asm)
-		if (buffer.byteLength >= 8 && new Uint32Array(buffer)[0] === 0x6d736100) {
-			console.log('Found valid cached zeroperl.wasm in OPFS');
-			wasmBuffer = buffer;
+		if (buffer.byteLength >= 8) {
+			const magic = new DataView(buffer).getUint32(0, true); // true for little-endian to match 0x6d736100 (\0asm)
+			if (magic === 0x6d736100) {
+				console.log('Found valid cached zeroperl.wasm in OPFS');
+				wasmBuffer = buffer;
+			} else {
+				console.log('Cached zeroperl.wasm is invalid or not a WASM file');
+			}
 		} else {
-			console.log('Cached zeroperl.wasm is invalid or not a WASM file');
+			console.log('Cached zeroperl.wasm is too small');
 		}
 	} catch (error) {
 		console.log('No cached zeroperl.wasm or error reading cache:', error);
