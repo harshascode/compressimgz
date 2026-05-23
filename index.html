@@ -1,11 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compress Image - Free Online Image Compression Tools</title>
+  <meta name="description" content="The ultimate collection of free, browser-based image compression tools. Compress JPEG, PNG, WEBP, AVIF, GIF, and remove EXIF data without uploading files.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Compress Image">
+  <meta property="og:title" content="Compress Image - Free Online Image Compression Tools">
+  <meta property="og:description" content="Compress images locally in your browser. Fast, secure, and free tools for JPEG, PNG, WEBP, AVIF, and GIF.">
+  <meta property="og:image" content="https://reduceimagesize.co/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://reduceimagesize.co/">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Compress Image - Free Online Image Compression Tools">
+  <meta name="twitter:description" content="Compress images locally in your browser. Fast, secure, and free tools for JPEG, PNG, WEBP, AVIF, and GIF.">
+  <meta name="twitter:image" content="https://reduceimagesize.co/images/og-image.png">
+
+  <link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="https://reduceimagesize.co/">
+  
+  <link rel="stylesheet" href="/src/css/styles.css">
+
+  <style>
+    .ui-tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      margin-top: 3em;
+      margin-bottom: 3em;
+    }
+    .ui-tool-card {
+      background: #fff;
+      border: 1px solid #F2F2F2;
+      border-radius: 0.75em;
+      padding: 2em 1.5em;
+      text-align: center;
+      box-shadow: 0px 5px 16px -2px rgba(42, 115, 217, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ui-tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 8px 24px -2px rgba(42, 115, 217, 0.2);
+    }
+    .ui-tool-icon {
+      width: 160px;
+      height: auto;
+      margin-bottom: 1.5em;
+    }
+    .ui-tool-name {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 0.5em;
+    }
+    .ui-tool-desc {
+      font-size: 1em;
+      color: var(--color-text-light);
+      line-height: 1.5;
+      margin-bottom: 1.5em;
+      flex-grow: 1;
+    }
+    .ui-tool-btn {
+      width: 100%;
+      pointer-events: none;
+    }
+    @media screen and (max-width: 600px) {
+      .ui-tools-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Compress Image",
+    "url": "https://reduceimagesize.co/",
+    "description": "A collection of high-performance image compression tools that run entirely in your browser.",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
 </head>
-<body>
-    <h1>Home</h1>
+<body class="ui-page">
+  <header class="ui-header ui-page-header">
+    <div class="ui-header-left">
+      <a href="/" class="ui-header-logo ui-logo">
+        <img src="/images/compressjpeg.png" alt="Compress Image Online" class="ui-logo-image" width="461" height="125">
+      </a>
+
+      <div class="ui-language ui-header-language" data-languages="%5B%7B%22code%22%3A%22en%22%2C%22name%22%3A%22English%22%7D%2C%7B%22code%22%3A%22de%22%2C%22name%22%3A%22Deutsch%22%7D%2C%7B%22code%22%3A%22es%22%2C%22name%22%3A%22Espa%C3%B1ol%22%7D%2C%7B%22code%22%3A%22fr%22%2C%22name%22%3A%22Fran%C3%A7ais%22%7D%2C%7B%22code%22%3A%22id%22%2C%22name%22%3A%22Indonesia%22%7D%2C%7B%22code%22%3A%22it%22%2C%22name%22%3A%22Italiano%22%7D%2C%7B%22code%22%3A%22ja%22%2C%22name%22%3A%22%E6%97%A5%E6%9C%AC%E8%AA%9E%22%7D%2C%7B%22code%22%3A%22ko%22%2C%22name%22%3A%22%ED%95%9C%EA%B5%AD%EC%96%B4%22%7D%2C%7B%22code%22%3A%22nl%22%2C%22name%22%3A%22Nederlands%22%7D%2C%7B%22code%22%3A%22pl%22%2C%22name%22%3A%22Polski%22%7D%2C%7B%22code%22%3A%22pt%22%2C%22name%22%3A%22Portugu%C3%AAs%22%7D%2C%7B%22code%22%3A%22ru%22%2C%22name%22%3A%22%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9%22%7D%2C%7B%22code%22%3A%22tr%22%2C%22name%22%3A%22T%C3%BCrk%C3%A7e%22%7D%2C%7B%22code%22%3A%22uk%22%2C%22name%22%3A%22%D0%A3%D0%BA%D1%80%D0%B0%D1%97%D0%BD%D1%81%D1%8C%D0%BA%D0%B0%22%7D%2C%7B%22code%22%3A%22vi%22%2C%22name%22%3A%22Ti%E1%BA%BFng%20vi%E1%BB%87t%22%7D%2C%7B%22code%22%3A%22zh%22%2C%22name%22%3A%22%E4%B8%AD%E6%96%87%22%7D%5D" data-current-lang="en" data-current-path="/">
+        <button class="ui-language-button">
+          <span class="ui-language-text">English</span>
+          <svg class="ui-language-icon" viewBox="0 0 13 6" width="13" height="6">
+            <use href="/images/icons.svg#arrow-down"></use>
+          </svg>
+        </button>
+        <div class="ui-language-overflow">
+          <ul class="ui-language-list"></ul>
+        </div>
+      </div>
+
+      <p class="ui-header-text">Fast, secure, and professional image compression tools. All processing happens locally in your browser — your files never leave your device.</p>
+      <p class="ui-header-text ui-header-text-hidden-sm">Drop your images below to start optimizing. Supports JPEG, PNG, WebP, AVIF, and GIF.</p>
+    </div>
+  </header>
+
+  <div class="ui-page-switch">
+    <nav class="ui-site-switch">
+      <a href="/" class="ui-site-switch-tab ui-site-switch-tab-active">
+        <span class="ui-site-switch-text">COMPRESSOR</span>
+      </a>
+      <a href="/jpeg" class="ui-site-switch-tab">
+        <span class="ui-site-switch-text">JPEG</span>
+      </a>
+      <a href="/png" class="ui-site-switch-tab">
+        <span class="ui-site-switch-text">PNG</span>
+      </a>
+      <a href="/webp" class="ui-site-switch-tab">
+        <span class="ui-site-switch-text">WEBP</span>
+      </a>
+      <a href="/avif" class="ui-site-switch-tab">
+        <span class="ui-site-switch-text">AVIF</span>
+      </a>
+      <a href="/gif" class="ui-site-switch-tab">
+        <span class="ui-site-switch-text">GIF</span>
+      </a>
+      <a href="/exifremover" class="ui-site-switch-tab ui-site-switch-tab-right">
+        <span class="ui-site-switch-text">EXIF</span>
+      </a>
+    </nav>
+  </div>
+
+  <div id="ui-app" class="ui-files ui-page-files">
+    <div class="ui-files-buttons">
+      <label class="ui-button ui-files-button">
+        <svg class="ui-button-icon" viewBox="0 0 16 16" width="16" height="16">
+          <use href="/images/icons.svg#browse"></use>
+        </svg>
+        <span class="ui-button-text">SELECT FILES</span>
+        <input type="file" id="ui-fileInput" class="ui-files-input-files" multiple accept=".jpg,.jpeg,.png,.webp,.avif,.gif">
+      </label>
+      <button id="ui-clearBtn" class="ui-button ui-button-secondary ui-files-button" disabled>
+        <svg class="ui-button-icon" viewBox="0 0 16 16" width="16" height="16">
+          <use href="/images/icons.svg#clear"></use>
+        </svg>
+        <span class="ui-button-text">CLEAR</span>
+      </button>
+    </div>
+
+    <div id="ui-dropZone" class="ui-files-list-outer">
+      <button id="ui-prevBtn" class="ui-scroll-button ui-files-scroll-button ui-files-scroll-button-prev" disabled>
+        <svg class="ui-scroll-button-icon ui-scroll-button-icon-left" viewBox="0 0 8 16" width="8" height="16">
+          <use href="/images/icons.svg#arrow-right"></use>
+        </svg>
+      </button>
+      <div id="ui-filesScroll" class="ui-files-list">
+        <ul id="ui-filesContainer" class="ui-files-list-inner"></ul>
+      </div>
+      <button id="ui-nextBtn" class="ui-scroll-button ui-files-scroll-button ui-files-scroll-button-next" disabled>
+        <svg class="ui-scroll-button-icon" viewBox="0 0 8 16" width="8" height="16">
+          <use href="/images/icons.svg#arrow-right"></use>
+        </svg>
+      </button>
+      <div id="ui-dropMessage" class="ui-files-drop-caption ui-drop-caption">
+        <svg class="ui-drop-caption-border" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+          <defs>
+            <clipPath id="ui-rectMask">
+              <rect fill="#000" x="0" y="0" width="100%" height="100%" rx="10" ry="10"></rect>
+            </clipPath>
+          </defs>
+          <rect width="100%" height="100%" rx="10" ry="10" fill="none" clip-path="url(#ui-rectMask)"></rect>
+        </svg>
+        <p class="ui-drop-caption-text">Drop Your Files Here</p>
+      </div>
+    </div>
+
+    <div class="ui-files-buttons">
+      <button id="ui-convertBtn" class="ui-button ui-button-dark ui-files-button" disabled>
+        <svg class="ui-button-icon" width="16" height="16">
+          <use href="/images/icons.svg#compress"></use>
+        </svg>
+        <span class="ui-button-text">COMPRESS</span>
+        <span id="ui-convertCounter" class="ui-button-counter" style="display: none;">0</span>
+      </button>
+      <button id="ui-downloadAllBtn" class="ui-button ui-button-success ui-files-button" disabled>
+        <svg class="ui-button-icon" width="16" height="16">
+          <use href="/images/icons.svg#download"></use>
+        </svg>
+        <span class="ui-button-text">SAVE ALL</span>
+        <span id="ui-downloadCounter" class="ui-button-counter" style="display: none;">0</span>
+      </button>
+    </div>
+  </div>
+
+  <section id="ui-comparisonPanel" class="ui-settings ui-page-settings">
+    <p class="ui-settings-title">
+      <span id="ui-settingsFileName" class="ui-settings-title-text"></span>
+      <span class="ui-settings-loader-outer">
+        <span id="ui-settingsLoader" class="ui-loader ui-settings-loader ui-loader-hidden">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </span>
+      </span>
+    </p>
+    <div class="ui-settings-content">
+      <div class="ui-settings-compare-outer">
+        <div class="ui-image-info ui-settings-image-info">
+          <p class="ui-image-info-text">
+            <span class="ui-image-info-title">Before:</span>
+            <span id="ui-originalSize" class="ui-image-info-bold">0 KB</span>
+          </p>
+          <p class="ui-image-info-text">
+            <span class="ui-image-info-title">After:</span>
+            <span id="ui-compressedSize" class="ui-image-info-bold ui-image-info-savings">0 KB</span>
+            <span id="ui-savingsPercent" class="ui-image-info-savings">(-0%)</span>
+          </p>
+        </div>
+        <div class="ui-compare ui-settings-compare">
+          <canvas id="ui-comparisonCanvas" class="ui-compare-canvas"></canvas>
+          <span id="ui-comparisonThumb" class="ui-thumb ui-compare-thumb">
+            <span class="ui-thumb-button">
+              <svg class="ui-thumb-icon ui-thumb-icon-left" viewBox="0 0 8 16" width="8" height="16">
+                <path d="M6 2L2 8l4 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="ui-thumb-icon ui-thumb-icon-right" viewBox="0 0 8 16" width="8" height="16">
+                <path d="M2 2l4 6-4 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </span>
+          <button id="ui-zoomIndicator" class="ui-zoom-indicator ui-zoom-indicator-hidden" title="Reset to 1:1">
+            <span class="ui-zoom-indicator-text">100%</span>
+            <svg class="ui-zoom-indicator-icon" viewBox="0 0 12 12" width="10" height="10">
+              <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="ui-settings-quality-outer">
+        <div class="ui-settings-quality">
+          <label for="ui-qualityInput" class="ui-quality-field">
+            <p id="ui-qualityLabel" class="ui-quality-title">Quality</p>
+          </label>
+          <input id="ui-qualityInput" type="text" class="ui-quality-input" value="80" maxlength="3" autocomplete="off">
+          <div class="ui-quality-range-outer">
+            <input id="ui-qualitySlider" type="range" step="1" min="10" max="100" value="80" class="ui-quality-range-input">
+          </div>
+          <button id="ui-applyQualityBtn" class="ui-button ui-quality-button">
+            <span class="ui-button-text">APPLY</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ui-tools-grid">
+    <a href="/jpeg" class="ui-tool-card">
+      <img src="/images/compressjpeg.png" alt="Compress JPEG" class="ui-tool-icon">
+      <h3 class="ui-tool-name">Compress JPEG</h3>
+      <p class="ui-tool-desc">Reduce JPEG file size while maintaining excellent visual quality using MozJPEG encoding.</p>
+      <div class="ui-button ui-tool-btn">Open Tool</div>
+    </a>
+
+    <a href="/png" class="ui-tool-card">
+      <img src="/images/compresspng.png" alt="Compress PNG" class="ui-tool-icon">
+      <h3 class="ui-tool-name">Compress PNG</h3>
+      <p class="ui-tool-desc">Optimize PNG images with lossless transparency. Perfect for logos and UI graphics.</p>
+      <div class="ui-button ui-tool-btn">Open Tool</div>
+    </a>
+
+    <a href="/webp" class="ui-tool-card">
+      <img src="/images/compresswebp.png" alt="Compress WEBP" class="ui-tool-icon">
+      <h3 class="ui-tool-name">Compress WebP</h3>
+      <p class="ui-tool-desc">The modern format for the web. Achieve superior compression compared to JPEG and PNG.</p>
+      <div class="ui-button ui-tool-btn">Open Tool</div>
+    </a>
+
+    <a href="/avif" class="ui-tool-card">
+      <img src="/images/compressavif.png" alt="Compress AVIF" class="ui-tool-icon">
+      <h3 class="ui-tool-name">Compress AVIF</h3>
+      <p class="ui-tool-desc">Next-generation image compression. High quality at incredibly small file sizes.</p>
+      <div class="ui-button ui-tool-btn">Open Tool</div>
+    </a>
+
+    <a href="/gif" class="ui-tool-card">
+      <img src="/images/compressgif.png" alt="Compress GIF" class="ui-tool-icon">
+      <h3 class="ui-tool-name">Compress GIF</h3>
+      <p class="ui-tool-desc">Optimize animated GIFs and static GIF images for faster loading and sharing.</p>
+      <div class="ui-button ui-tool-btn">Open Tool</div>
+    </a>
+
+    <a href="/exifremover" class="ui-tool-card">
+      <img src="/images/exifremover.png" alt="EXIF Remover" class="ui-tool-icon">
+      <h3 class="ui-tool-name">EXIF Remover</h3>
+      <p class="ui-tool-desc">Protect your privacy by stripping sensitive metadata and EXIF data from your photos.</p>
+      <div class="ui-button ui-tool-btn">Open Tool</div>
+    </a>
+  </div>
+
+  <div class="ui-long">
+    <article class="ui-article">
+      <h2>Professional Image Optimization in Your Browser</h2>
+      <p>Compress Image is a comprehensive suite of tools designed to help you optimize your digital assets without compromising your privacy. Our tools leverage the power of WebAssembly to bring professional-grade compression libraries directly to your browser.</p>
+
+      <div class="ui-article-highlight">
+        <strong>Privacy First:</strong> Unlike other online compressors, we never upload your images to a server. All processing is done locally on your computer, ensuring your sensitive data stays private.
+      </div>
+
+      <section>
+        <h2>Universal Image Compression</h2>
+        <p>This universal tool supports all major web image formats. Simply drop your files above, and we'll automatically detect the format and apply the most efficient compression algorithm for each file.</p>
+
+        <h3>Supported Formats:</h3>
+        <ul>
+          <li><strong>JPEG:</strong> Best for photographs and realistic images.</li>
+          <li><strong>PNG:</strong> Best for logos, icons, and images with transparency.</li>
+          <li><strong>WebP:</strong> A modern alternative that offers superior compression for both lossy and lossless images.</li>
+          <li><strong>AVIF:</strong> The next-generation format with even better compression than WebP.</li>
+          <li><strong>GIF:</strong> For animated images and simple graphics.</li>
+        </ul>
+
+        <div class="ui-article-tip">
+          <strong>Pro Tip:</strong> You can mix and match different formats in the same batch. We'll handle everything automatically!
+        </div>
+      </section>
+
+      <section>
+        <h2>How It Works</h2>
+        <p>Our tools run entirely in your browser using WebAssembly. This means:</p>
+        <ul>
+          <li><strong>Speed:</strong> No waiting for uploads or downloads.</li>
+          <li><strong>Security:</strong> Your files never leave your device.</li>
+          <li><strong>Reliability:</strong> Works offline once loaded.</li>
+        </ul>
+      </section>
+    </article>
+  </div>
+
+  <footer class="ui-footer">
+    <div class="ui-footer-inner">
+      <p class="ui-footer-text">Your files never leave your device.</p>
+      <p class="ui-footer-text">&copy; SIA Webby <span class="ui-footer-sep">|</span> <a href="/terms" id="ui-termsLink" class="ui-footer-link">Terms and Privacy</a></p>
+    </div>
+  </footer>
+
+  <div id="ui-termsPopup" class="ui-popup">
+    <div class="ui-popup-overflow">
+      <div class="ui-popup-title">Terms and Privacy</div>
+      <button class="ui-popup-close" id="ui-termsClose">
+        <svg class="ui-popup-close-icon" viewBox="0 0 18 18" width="18" height="18">
+          <use href="/images/icons.svg#remove"></use>
+        </svg>
+      </button>
+      <div class="ui-popup-content" id="ui-termsContent"></div>
+    </div>
+  </div>
+
+  <template id="ui-fileCardTemplate">
+    <li class="ui-files-file ui-file" data-id="">
+      <header class="ui-file-header">
+        <span class="ui-file-title"></span>
+        <button class="ui-file-close ui-remove-btn">
+          <svg class="ui-file-close-icon" viewBox="0 0 18 18" width="18" height="18">
+            <use href="/images/icons.svg#remove"></use>
+          </svg>
+        </button>
+      </header>
+      <div class="ui-file-content">
+        <img src="" alt="" class="ui-file-image ui-file-image-hidden">
+        <div class="ui-file-state ui-file-state-pending ui-file-state-visible">
+          <span class="ui-file-state-text ui-file-state-text-format"></span>
+        </div>
+        <div class="ui-file-state ui-file-state-converting">
+          <svg class="ui-file-state-icon" viewBox="0 0 56 58" width="56" height="58">
+            <use href="/images/icons.svg#processing"></use>
+          </svg>
+          <span class="ui-file-state-text">PROCESSING...</span>
+        </div>
+        <div class="ui-file-state ui-file-state-error">
+          <svg class="ui-file-state-icon" viewBox="0 0 53 46" width="53" height="46">
+            <use href="/images/icons.svg#error"></use>
+          </svg>
+          <span class="ui-file-state-text">ERROR</span>
+          <span class="ui-file-state-detail"></span>
+        </div>
+        <div class="ui-file-state ui-file-state-done">
+          <span class="ui-file-state-text ui-file-state-text-format"></span>
+        </div>
+        <div class="ui-file-state ui-file-state-saving">
+          <span class="ui-file-state-text ui-file-state-text-saving"></span>
+        </div>
+      </div>
+      <footer class="ui-file-footer">
+        <button type="button" class="ui-file-button ui-file-button-hidden" disabled>
+          <span class="ui-file-button-text"></span>
+          <span class="ui-file-button-progress"></span>
+        </button>
+      </footer>
+    </li>
+  </template>
+
+  <script type="module" src="/src/index.ts"></script>
 </body>
 </html>
