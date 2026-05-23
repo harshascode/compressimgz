@@ -93,6 +93,15 @@ export function initLanguageSelectors(): void {
   });
 }
 
+export function initNavigation(): void {
+  const container = document.querySelector<HTMLElement>('.ui-page-switch');
+  const activeTab = document.querySelector<HTMLElement>('.ui-site-switch-tab-active');
+  if (container && activeTab) {
+    const scrollLeft = activeTab.offsetLeft - (container.clientWidth / 2) + (activeTab.clientWidth / 2);
+    container.scrollLeft = scrollLeft;
+  }
+}
+
 export function initImageCompressor(config: ImageCompressorConfig): void {
   const formats = Array.isArray(config) ? config : [config];
   const MAX_FILES = 20;
@@ -574,5 +583,6 @@ export function initImageCompressor(config: ImageCompressorConfig): void {
   canvas.addEventListener('pointerdown', setSplitFromEvent);
 
   initLanguageSelectors();
+  initNavigation();
   updateUi();
 }

@@ -1,3 +1,5 @@
+import { initLanguageSelectors, initNavigation } from './image-compressor';
+
 type Status = 'pending' | 'reading' | 'ready' | 'processing' | 'done' | 'error';
 
 type FileItem = {
@@ -353,3 +355,5 @@ dropZone.addEventListener('drop', e => {
 });
 
 updateButtons();
+initLanguageSelectors();
+initNavigation();

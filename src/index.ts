@@ -1,4 +1,7 @@
-import { initImageCompressor } from './image-compressor';
+import { initLanguageSelectors, initNavigation, initImageCompressor } from './image-compressor';
+
+initLanguageSelectors();
+initNavigation();
 
 initImageCompressor([
   {
