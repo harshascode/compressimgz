@@ -353,15 +353,6 @@ html, input, button {
   user-select: none;
 }
 
-.ui-page-switch {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: -1px;
-  position: relative;
-  z-index: 2;
-}
-
 .ui-files-buttons {
   position: relative;
   display: flex;
@@ -1441,16 +1432,33 @@ html, input, button {
   justify-content: flex-start;
   margin-bottom: -1px;
   position: relative;
+  z-index: 2;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ui-page-switch::-webkit-scrollbar {
+  display: none;
 }
 
 .ui-site-switch {
   display: flex;
   gap: 3px;
   width: 100%;
+  flex-wrap: nowrap;
 }
 
 .ui-site-switch-tab-right {
   margin-left: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .ui-site-switch-tab-right {
+    margin-left: 0;
+  }
 }
 
 .ui-site-switch-tab {
@@ -1465,6 +1473,8 @@ html, input, button {
   border-radius: 10px 10px 0 0;
   transition: background-color 0.2s, color 0.2s;
   position: relative;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .ui-site-switch-tab:hover {
@@ -2188,58 +2198,4 @@ html, input, button {
   font-size: 2.625em;
   font-weight: 600;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-}
-
-/* Site switch tabs */
-.ui-site-switch {
-  display: flex;
-  gap: 3px;
-  width: 100%;
-}
-
-.ui-site-switch-tab-right {
-  margin-left: auto;
-}
-
-.ui-site-switch-tab {
-  padding: 8px 20px;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  color: #38404B;
-  background: #eaeaea;
-  border: 1px solid #F2F2F2;
-  border-bottom: none;
-  border-radius: 10px 10px 0 0;
-  transition: background-color 0.2s, color 0.2s;
-  position: relative;
-}
-
-.ui-site-switch-tab:hover {
-  background: #f2f2f2;
-  color: #38404B;
-}
-
-.ui-site-switch-tab-active {
-  background: #fff;
-  color: #d1580a;
-  cursor: default;
-  z-index: 1;
-  box-shadow: 0px -3px 12px -2px rgba(42, 115, 217, 0.15);
-}
-
-.ui-site-switch-tab-active:hover {
-  background: #fff;
-  color: #d1580a;
-}
-
-.ui-site-switch-text {
-  display: block;
-}
-
-@media screen and (max-width: 555px) {
-  .ui-site-switch-tab {
-    padding: 6px 14px;
-    font-size: 13px;
-  }
 }
