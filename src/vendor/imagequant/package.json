@@ -1,0 +1,15 @@
+{
+  "name": "imagequant",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "imagequant_bg.wasm",
+    "imagequant.js",
+    "imagequant.d.ts"
+  ],
+  "main": "imagequant.js",
+  "types": "imagequant.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
