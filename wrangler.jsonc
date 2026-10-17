@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "compressimgz",
+  "compatibility_date": "2026-10-12",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    // Required: points Cloudflare at the Vite build output.
+    // Without this, Wrangler rejects the config ("missing the required
+    // 'directory' property") and the 404 fix never gets applied.
+    "directory": "./dist",
+    // Serve the nearest 404.html with a real 404 status for unmatched
+    // routes instead of falling back to index.html (SPA behaviour).
+    "not_found_handling": "404-page"
+  }
+}
