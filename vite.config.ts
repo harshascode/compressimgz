@@ -14,6 +14,8 @@ export default defineConfig({
         avif: fileURLToPath(new URL('avif-compressor.html', import.meta.url)),
         gif: fileURLToPath(new URL('gif-compressor.html', import.meta.url)),
         exifremover: fileURLToPath(new URL('exifremover.html', import.meta.url)),
+        terms: fileURLToPath(new URL('terms.html', import.meta.url)),
+        404: fileURLToPath(new URL('404.html', import.meta.url)),
       },
     },
   },
